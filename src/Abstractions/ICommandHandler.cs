@@ -1,4 +1,4 @@
-﻿namespace Cqrs.Core
+﻿namespace Cqrs.Core.Abstractions
 {
     public interface ICommandHandler<in TCommand>
         where TCommand : ICommand

@@ -1,4 +1,4 @@
-﻿namespace Cqrs.Core
+﻿namespace Cqrs.Core.Abstractions
 {
     using System.Threading.Tasks;
 
