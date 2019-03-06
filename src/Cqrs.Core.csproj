@@ -2,6 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.1</TargetFramework>
+    <Authors>beletsky.anton</Authors>
+    <PackageLicenseUrl>https://github.com/ASbeletsky/Cqrs.Core/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/ASbeletsky/Cqrs.Core</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ASbeletsky/Cqrs.Core</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Cqrs Cqs</PackageTags>
+    <Description>Lightweight implementation of Cqrs pattern</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard1.1\Cqrs.Core.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
