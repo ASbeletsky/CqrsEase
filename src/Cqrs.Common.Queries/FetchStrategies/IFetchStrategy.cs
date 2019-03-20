@@ -4,7 +4,9 @@ namespace Cqrs.Common.Queries
 
     public interface IFetchStrategy<T>
     {
-        IEnumerable<string> IncludePaths { get; }
+        IEnumerable<string> IncludedPaths { get; }
+
+        void Include(string path);
     }
 
     public interface INestedFetchStrategy<T, TPreviousResult> : IFetchStrategy<T>
