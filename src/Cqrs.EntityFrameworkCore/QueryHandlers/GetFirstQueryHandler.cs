@@ -33,9 +33,9 @@
             return PrepareQuery(query).FirstOrDefault();
         }
 
-        public Task<TEntity> RequestAsync(GetFirstQuery<TEntity> query)
+        public async Task<TEntity> RequestAsync(GetFirstQuery<TEntity> query)
         {
-            return PrepareQuery(query).FirstOrDefaultAsync();
+            return await PrepareQuery(query).FirstOrDefaultAsync();
         }
     }
 }

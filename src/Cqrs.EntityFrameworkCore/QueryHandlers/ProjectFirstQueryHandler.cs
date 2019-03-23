@@ -32,9 +32,9 @@
             return PrepareQuery(query).FirstOrDefault();
         }
 
-        public Task<TDest> RequestAsync(ProjectFirstQuery<TSource, TDest> query)
+        public async Task<TDest> RequestAsync(ProjectFirstQuery<TSource, TDest> query)
         {
-            return PrepareQuery(query).FirstOrDefaultAsync();
+            return await PrepareQuery(query).FirstOrDefaultAsync();
         }
     }
 }
