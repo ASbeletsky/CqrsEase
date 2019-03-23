@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cqrs.Common.Commands\Cqrs.Common.Commands.csproj" />
+    <ProjectReference Include="..\Cqrs.Common.Queries\Cqrs.Common.Queries.csproj" />
+    <ProjectReference Include="..\Cqrs.Core\Cqrs.Core.csproj" />
+  </ItemGroup>
+
+</Project>
