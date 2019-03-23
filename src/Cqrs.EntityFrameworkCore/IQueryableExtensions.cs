@@ -1,7 +1,8 @@
 ﻿namespace Cqrs.EntityFrameworkCore
 {
-    using Cqrs.Common.Queries;
     #region Using
+    using Cqrs.Common.Queries;
+    using Cqrs.Common.Queries.Pagination;
     using Cqrs.Common.Queries.Sorting;
     using NSpecifications;
     using System;
@@ -18,6 +19,16 @@
             if (fetchStrategy == null) throw new ArgumentNullException("fetchStrategy");
             IProjector projector = null;
             return projector.ProjectOnly<T, T>(source, fetchStrategy.FetchedPaths);
+        }
+
+        internal static IQueryable<T> MaybeTake<T>(this IQueryable<T> source, IPage page)
+        {
+            if(page != null)
+            {
+                return source.Skip(page.Offset).Take(page.Size);
+            }
+
+            return source;
         }
 
         #region Filtering
@@ -105,7 +116,7 @@
 
             var methodCall = Expression.Call(typeof(Queryable), method,
                 new Type[] { source.ElementType, body.Type },
-                source.Expression,, Expression.Quote(Expression.Lambda(body, parameter)));
+                source.Expression, Expression.Quote(Expression.Lambda(body, parameter)));
 
             return (IOrderedQueryable<T>)source.Provider.CreateQuery(methodCall);
         }
