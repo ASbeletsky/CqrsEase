@@ -1,7 +1,7 @@
 ﻿namespace Cqrs.Common.Queries
 {
     #region
-    using Cqrs.Common.Queries.ProjectionStateries;
+    using Cqrs.Common.Queries.FetchStateries;
     using Cqrs.Core.Abstractions;
     using Cqrs.Model.Abstractions;
     #endregion

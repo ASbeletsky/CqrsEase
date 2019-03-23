@@ -1,4 +1,4 @@
-﻿namespace Cqrs.Common.Queries.ProjectionStateries
+﻿namespace Cqrs.Common.Queries.FetchStateries
 {
     #region Using
     using System;

@@ -2,7 +2,7 @@
 {
     #region Using
     using Cqrs.Common.Queries.Pagination;
-    using Cqrs.Common.Queries.ProjectionStateries;
+    using Cqrs.Common.Queries.FetchStateries;
     using Cqrs.Common.Queries.Sorting;
     using Cqrs.Core.Abstractions;
     using NSpecifications;
