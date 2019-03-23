@@ -3,14 +3,13 @@ using NSpecifications;
 
 namespace Cqrs.Common.Queries
 {
-    public class ExistsQuery<T, TSpecification> : IQuery<bool>
-            where TSpecification : ISpecification<T>
+    public class ExistsQuery<T> : IQuery<bool>
     {
-        public ExistsQuery(TSpecification specification)
+        public ExistsQuery(ISpecification<T> specification)
         {
             Specification = specification;
         }
 
-        public TSpecification Specification { get; }
+        public ISpecification<T> Specification { get; }
     }
 }
