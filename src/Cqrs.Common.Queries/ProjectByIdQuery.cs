@@ -11,25 +11,22 @@
     {
         public TKey Id { get; private set; }
 
-        public IFetchStrategy<TEntity> FetchStrategy { get; set; }
-
-        public IProjectionStatery<TDto> ProjectionStrategy { get; set; }
+        public IFetchStrategy<TDto> FetchStrategy { get; set; }
 
         public ProjectByIdQuery(TKey id)
-            : this(id, ProjectionStatery<TDto>.ProjectAll)
+            : this(id, new FetchAllStatery<TDto>())
         {
         }
 
-        public ProjectByIdQuery(TKey id, IProjectionStatery<TDto> projectionStatery)
+        public ProjectByIdQuery(TKey id, IFetchStrategy<TDto> projectionStatery)
             : this(id, null, projectionStatery)
         {
         }
 
-        public ProjectByIdQuery(TKey id, IFetchStrategy<TEntity> fetchStrategy, IProjectionStatery<TDto> projectionStatery)
+        public ProjectByIdQuery(TKey id, IFetchStrategy<TEntity> fetchStrategy, IFetchStrategy<TDto> projectionStatery)
         {
             Id = id;
-            FetchStrategy = fetchStrategy;
-            ProjectionStrategy = projectionStatery;
+            FetchStrategy = projectionStatery;
         }
     }
 }

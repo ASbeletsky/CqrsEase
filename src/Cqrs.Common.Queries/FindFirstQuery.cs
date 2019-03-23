@@ -1,10 +1,9 @@
 ﻿using Cqrs.Common.Queries.Sorting;
 using Cqrs.Core.Abstractions;
-using Cqrs.Model.Abstractions;
 using NSpecifications;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq.Expressions;
 
 namespace Cqrs.Common.Queries
 {
@@ -17,14 +16,26 @@ namespace Cqrs.Common.Queries
 
         }
 
-        public FindFirstQuery(TSpecification specification, IOrderedFetchStrategy<T> fetchStrategy)
+        public FindFirstQuery(TSpecification specification, IFetchStrategy<T> fetchStrategy)
+            : this(specification, fetchStrategy, null)
+        {
+
+        }
+
+        public FindFirstQuery(TSpecification specification, IFetchStrategy<T> fetchStrategy, Expression<Func<T, object>> sortKeySelector)
         {
             Specification = specification;
             FetchStrategy = fetchStrategy;
+            if (sortKeySelector != null)
+            {
+                Sorting = new OrderCreteria<T>[] { new OrderCreteria<T>(sortKeySelector, OrderDirection.ASC) };
+            }
         }
 
         public TSpecification Specification { get; }
 
-        public IOrderedFetchStrategy<T> FetchStrategy { get; set; }
+        public IFetchStrategy<T> FetchStrategy { get; }
+
+        public IEnumerable<OrderCreteria<T>> Sorting { get; }
     }
 }

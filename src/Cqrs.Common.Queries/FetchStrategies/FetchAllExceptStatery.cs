@@ -6,15 +6,15 @@
     using System.Linq.Expressions;
     #endregion
 
-    public class ProjectAllExceptStatery<T> : ProjectionStatery<T>
+    public class FetchAllExceptStatery<T> : FetchStrategy<T>
     {
-        public ProjectAllExceptStatery(params string[] excludedPaths)
+        public FetchAllExceptStatery(params string[] excludedPaths)
             : base(typeof(T).GetProperiesNames().Except(excludedPaths))
         {
                 
         }
 
-        public ProjectAllExceptStatery(params Expression<Func<T, object>>[] excludedPaths)
+        public FetchAllExceptStatery(params Expression<Func<T, object>>[] excludedPaths)
             : this(excludedPaths.Select(e => e.ToPropertyName()).ToArray())
         {
                 
