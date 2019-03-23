@@ -4,6 +4,7 @@
     using NSpecifications;
     using System;
     using System.Linq.Expressions;
+    #endregion
 
     public class ProjectFirstQuery<TSource, TDest> : GetFirstQuery<TDest>
     {
