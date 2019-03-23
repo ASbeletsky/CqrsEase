@@ -3,14 +3,13 @@ using NSpecifications;
 
 namespace Cqrs.Common.Queries
 {
-    public class CountQuery<T, TSpecification> : IQuery<long>
-        where TSpecification : ISpecification<T>
+    public class CountQuery<T> : IQuery<long>
     {
-        public CountQuery(TSpecification specification)
+        public CountQuery(ISpecification<T> specification)
         {
             Specification = specification;
         }
 
-        public TSpecification Specification { get; }
+        public ISpecification<T> Specification { get; }
     }
 }
