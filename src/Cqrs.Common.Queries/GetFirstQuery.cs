@@ -13,9 +13,15 @@
     public class GetFirstQuery<T> : IQuery<T>
     {
         public GetFirstQuery(ISpecification<T> specification)
-            : this(specification, fetchStrategy: new FetchAllStatery<T>())
+            : this(specification, orderBy: null)
         {
 
+        }
+
+        public GetFirstQuery(ISpecification<T> specification, string orderBy)
+            : this(specification, new FetchAllStatery<T>(), orderBy)
+        {
+                
         }
 
         public GetFirstQuery(ISpecification<T> specification, IFetchStrategy<T> fetchStrategy)
@@ -24,13 +30,13 @@
 
         }
 
-        public GetFirstQuery(ISpecification<T> specification, IFetchStrategy<T> fetchStrategy, Expression<Func<T, object>> sortKeySelector)
+        public GetFirstQuery(ISpecification<T> specification, IFetchStrategy<T> fetchStrategy, string orderBy)
         {
             Specification = specification;
             FetchStrategy = fetchStrategy;
-            if (sortKeySelector != null)
+            if (orderBy != null)
             {
-                Sorting = new OrderCreteria<T>[] { new OrderCreteria<T>(sortKeySelector, OrderDirection.ASC) };
+                Sorting = new OrderCreteria<T>[] { new OrderCreteria<T>(orderBy, OrderDirection.ASC) };
             }
         }
 

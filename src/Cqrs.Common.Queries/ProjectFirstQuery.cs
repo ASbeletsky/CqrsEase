@@ -12,7 +12,7 @@
         {
         }
 
-        public ProjectFirstQuery(ISpecification<TDest> specification, Expression<Func<TDest, object>> sortKeySelector) : base(specification, null, sortKeySelector)
+        public ProjectFirstQuery(ISpecification<TDest> specification, string orderBy) : base(specification, null, orderBy)
         {
         }
     }
