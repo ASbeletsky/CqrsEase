@@ -17,8 +17,8 @@
         internal static IQueryable<T> ApplyFetchStrategy<T>(this IQueryable<T> source, IFetchStrategy<T> fetchStrategy)
         {
             if (fetchStrategy == null) throw new ArgumentNullException("fetchStrategy");
-            IProjector projector = null;
-            return projector.ProjectOnly<T, T>(source, fetchStrategy.FetchedPaths);
+            IProjector projector = new IQueriableProjector();
+            return projector.ProjectOnly<T>(source, fetchStrategy.FetchedPaths);
         }
 
         internal static IQueryable<T> MaybeTake<T>(this IQueryable<T> source, IPage page)
@@ -60,7 +60,7 @@
 
         internal static IQueryable<T> MaybeSort<T>(this IQueryable<T> source, OrderCreteria<T> orderCreteria)
         {
-            if (source is IOrderedQueryable<T> orderedSource) return orderedSource.MaybeSort(orderCreteria);
+            if (source.IsOrdered()) return (source as IOrderedQueryable<T>).MaybeSort(orderCreteria);
 
             if (orderCreteria != null)
             {
@@ -68,6 +68,16 @@
             }
 
             return source;
+        }
+
+        internal static bool IsOrdered<T>(this IQueryable<T> queryable)
+        {
+            if (queryable == null)
+            {
+                throw new ArgumentNullException("queryable");
+            }
+
+            return queryable.Expression.Type == typeof(IOrderedQueryable<T>);
         }
 
         internal static IOrderedQueryable<T> MaybeSort<T>(this IOrderedQueryable<T> source, OrderCreteria<T> orderCreteria)
