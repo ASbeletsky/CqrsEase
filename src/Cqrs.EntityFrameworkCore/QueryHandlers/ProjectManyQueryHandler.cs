@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Cqrs.EntityFrameworkCore.QueryHandlers
 {
-    internal class ProjectManyQueryHandler<TSource, TDest>
+    public class ProjectManyQueryHandler<TSource, TDest>
         : GetManyQueryHandler<TDest>
         , IQueryHandler<ProjectManyQuery<TSource, TDest>, IEnumerable<TDest>>
         , IQueryHandler<ProjectManyQuery<TSource, TDest>, ILimitedEnumerable<TDest>>

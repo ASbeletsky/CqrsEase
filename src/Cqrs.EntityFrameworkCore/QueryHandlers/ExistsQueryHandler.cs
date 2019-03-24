@@ -8,7 +8,7 @@
     using System.Threading.Tasks;
     #endregion
 
-    internal class ExistsQueryHandler<T>
+    public class ExistsQueryHandler<T>
         : IQueryHandler<ExistsQuery<T>, bool>
         , IQueryHandlerAsync<ExistsQuery<T>, bool>
         where T : class

@@ -8,7 +8,7 @@
     using System.Threading.Tasks;
     #endregion
 
-    internal class ProjectFirstQueryHandler<TSource, TDest>
+    public class ProjectFirstQueryHandler<TSource, TDest>
         : IQueryHandler<ProjectFirstQuery<TSource, TDest>, TDest>
         , IQueryHandlerAsync<ProjectFirstQuery<TSource, TDest>, TDest>
         where TSource : class

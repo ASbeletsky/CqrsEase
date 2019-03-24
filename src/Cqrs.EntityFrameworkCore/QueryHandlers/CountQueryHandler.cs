@@ -8,7 +8,7 @@
     using System.Threading.Tasks;
     #endregion
 
-    internal class CountQueryHandler<T>
+    public class CountQueryHandler<T>
         : IQueryHandler<CountQuery<T>, long>
         , IQueryHandlerAsync<CountQuery<T>, long>
         where T : class

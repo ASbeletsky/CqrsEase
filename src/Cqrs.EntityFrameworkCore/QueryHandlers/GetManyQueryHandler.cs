@@ -10,7 +10,7 @@
     using System.Threading.Tasks;
     #endregion
 
-    internal class GetManyQueryHandler<T>
+    public class GetManyQueryHandler<T>
         : IQueryHandler<GetManyQuery<T>, IEnumerable<T>>
         , IQueryHandler<GetManyQuery<T>, ILimitedEnumerable<T>>
         , IQueryHandlerAsync<GetManyQuery<T>, IEnumerable<T>>

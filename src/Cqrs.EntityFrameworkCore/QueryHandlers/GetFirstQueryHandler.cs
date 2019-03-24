@@ -8,7 +8,7 @@
     using System.Threading.Tasks;
     #endregion
 
-    internal class GetFirstQueryHandler<TEntity> 
+    public class GetFirstQueryHandler<TEntity> 
         : IQueryHandler<GetFirstQuery<TEntity>, TEntity>
         , IQueryHandlerAsync<GetFirstQuery<TEntity>, TEntity>
         where TEntity : class
