@@ -1,4 +1,5 @@
 ﻿using Cqrs.Common.Queries;
+using Cqrs.Common.Queries.FetchStateries;
 using Cqrs.Core;
 using Cqrs.EntityFrameworkCore;
 using Cqrs.EntityFrameworkCore.QueryHandlers;
@@ -74,6 +75,50 @@ namespace Cqrs.Tests.EFCore
 
                 Assert.NotNull(blog);
                 Assert.Equal(expectedBlogId, blog.Id);
+            }
+        }
+
+        [Fact]
+        public void SelectsAllFileds_WhenFetchStrategyNotProvided()
+        {
+            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "SelectsAllFileds_WhenFetchStrategyNotProvided").Options;
+            var context = new BloggingContext(options);
+            using (context)
+            {
+                var expectedBlog = new Blog { Id = 3, Title = "some blog title" };
+                context.Blogs.Add(expectedBlog);
+                context.SaveChanges();
+
+                var query = new GetFirstQuery<Blog>(new Spec<Blog>(b => b.Id > 0));
+                var queryHandler = new GetFirstQueryHandler<Blog>(new EfDataSourceBased(context));
+                var actualBlog = queryHandler.Request(query);
+
+                Assert.NotNull(actualBlog);
+                Assert.Equal(expectedBlog.Id, actualBlog.Id);
+                Assert.Equal(expectedBlog.Title, actualBlog.Title);
+            }
+        }
+
+        [Fact]
+        public void SelectsOnlyNeededFileds_WhenFetchStrategyProvided()
+        {
+            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "SelectsOnlyNeededFileds_WhenFetchStrategyProvided").Options;
+            var context = new BloggingContext(options);
+            using (context)
+            {
+                var expectedBlog = new Blog { Id = 3, Title = "some blog title" };
+                context.Blogs.Add(expectedBlog);
+                context.SaveChanges();
+
+                var someSpec = new Spec<Blog>(b => b.Id > 0);
+                var includeOnlyId = new FetchOnlyStatery<Blog>((b => b.Id));
+                var query = new GetFirstQuery<Blog>(someSpec, includeOnlyId);
+                var queryHandler = new GetFirstQueryHandler<Blog>(new EfDataSourceBased(context));
+                var actualBlog = queryHandler.Request(query);
+
+                Assert.NotNull(actualBlog);
+                Assert.Equal(expectedBlog.Id, actualBlog.Id);
+                Assert.Null(actualBlog.Title);
             }
         }
     }
