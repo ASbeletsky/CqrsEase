@@ -12,12 +12,7 @@ namespace Cqrs.Common.Queries
     {
         public static string ToPropertyName<T, TResult>(this Expression<Func<T, TResult>> selector)
         {
-            var me = selector.Body as MemberExpression;
-            if (me == null)
-            {
-                throw new ArgumentException("MemberException expected.");
-            }
-
+            var me = selector.Body.AsMemberExpression() ?? throw new ArgumentException("Member expresison expected");
             var propertyName = me.ToString().Remove(0, 2);
             return propertyName;
         }
@@ -25,6 +20,16 @@ namespace Cqrs.Common.Queries
         public static IEnumerable<string> GetProperiesNames(this Type type)
         {
             return type.GetTypeInfo().DeclaredProperties.Select(p => p.Name);
+        }
+
+        internal static MemberExpression AsMemberExpression(this Expression exp)
+        {
+            switch (exp)
+            {
+                case MemberExpression me: return me;
+                case UnaryExpression unaryExpression: return unaryExpression.Operand as MemberExpression;
+                default: throw new ArgumentException("Cannot convert to member expresison.");
+            }
         }
     }
 }

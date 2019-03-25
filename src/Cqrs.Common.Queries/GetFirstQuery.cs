@@ -13,30 +13,32 @@
     public class GetFirstQuery<T> : IQuery<T>
     {
         public GetFirstQuery(ISpecification<T> specification)
-            : this(specification, orderBy: null)
+            : this(specification, fetchStrategy: new FetchAllStatery<T>(), orderCreteria: null)
         {
-
         }
 
         public GetFirstQuery(ISpecification<T> specification, string orderBy)
-            : this(specification, new FetchAllStatery<T>(), orderBy)
+            : this(specification, new FetchAllStatery<T>(), new OrderCreteria<T>(orderBy, OrderDirection.ASC))
+        {               
+        }
+
+        public GetFirstQuery(ISpecification<T> specification, Expression<Func<T, object>> orderBy)
+            : this(specification, new FetchAllStatery<T>(), new OrderCreteria<T>(orderBy, OrderDirection.ASC))
         {
-                
         }
 
         public GetFirstQuery(ISpecification<T> specification, IFetchStrategy<T> fetchStrategy)
             : this(specification, fetchStrategy, null)
         {
-
         }
 
-        public GetFirstQuery(ISpecification<T> specification, IFetchStrategy<T> fetchStrategy, string orderBy)
+        public GetFirstQuery(ISpecification<T> specification, IFetchStrategy<T> fetchStrategy, OrderCreteria<T> orderCreteria)
         {
             Specification = specification;
             FetchStrategy = fetchStrategy;
-            if (orderBy != null)
+            if (orderCreteria != null)
             {
-                Sorting = new OrderCreteria<T>[] { new OrderCreteria<T>(orderBy, OrderDirection.ASC) };
+                Sorting = new OrderCreteria<T>[] { orderCreteria };
             }
         }
 

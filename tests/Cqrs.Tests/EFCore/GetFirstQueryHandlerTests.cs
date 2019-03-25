@@ -36,9 +36,9 @@ namespace Cqrs.Tests.EFCore
         }
 
         [Fact]
-        public void AppliesSorting_WhenProvided()
+        public void AppliesSorting_WhenProvided_AsString()
         {
-            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "AppliesSorting_WhenProvided").Options;
+            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "AppliesSorting_WhenProvided_AsString").Options;
             var context = new BloggingContext(options);
             using (context)
             {
@@ -48,6 +48,27 @@ namespace Cqrs.Tests.EFCore
                 var expectedBlogId = 1;
                 var spec = new Spec<Blog>(b => b.Title == "same blog title");
                 var query = new GetFirstQuery<Blog>(spec, orderBy: nameof(Blog.Id));
+                var queryHandler = new GetFirstQueryHandler<Blog>(new EfDataSourceBased(context));
+                var blog = queryHandler.Request(query);
+
+                Assert.NotNull(blog);
+                Assert.Equal(expectedBlogId, blog.Id);
+            }
+        }
+
+        [Fact]
+        public void AppliesSorting_WhenProvided_AsExpression()
+        {
+            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "AppliesSorting_WhenProvided_AsExpression").Options;
+            var context = new BloggingContext(options);
+            using (context)
+            {
+                context.Blogs.AddRange(new Blog { Id = 3, Title = "same blog title" }, new Blog { Id = 2, Title = "same blog title" }, new Blog { Id = 1, Title = "same blog title" });
+                context.SaveChanges();
+
+                var expectedBlogId = 1;
+                var spec = new Spec<Blog>(b => b.Title == "same blog title");
+                var query = new GetFirstQuery<Blog>(spec, orderBy: x => x.Id);
                 var queryHandler = new GetFirstQueryHandler<Blog>(new EfDataSourceBased(context));
                 var blog = queryHandler.Request(query);
 
