@@ -6,13 +6,13 @@
     using System.Linq.Expressions;
     #endregion
 
-    public class FetchOnlyStatery<T> : FetchStrategy<T>
+    public class FetchOnlyStratery<T> : FetchStrategy<T>
     {
-        public FetchOnlyStatery(params string[] includedPaths) : base(includedPaths)
+        public FetchOnlyStratery(params string[] includedPaths) : base(includedPaths)
         {
         }
 
-        public FetchOnlyStatery(params Expression<Func<T, object>>[] includedPaths)
+        public FetchOnlyStratery(params Expression<Func<T, object>>[] includedPaths)
             : base(includedPaths.Select(e => e.ToPropertyName()))
         {
         }
