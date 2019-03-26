@@ -14,7 +14,7 @@
         public IFetchStrategy<TDto> FetchStrategy { get; set; }
 
         public ProjectByIdQuery(TKey id)
-            : this(id, new FetchAllStatery<TDto>())
+            : this(id, null)
         {
         }
 

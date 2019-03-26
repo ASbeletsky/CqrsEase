@@ -7,23 +7,34 @@
     using NSpecifications;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
     #endregion
 
     public class GetFirstQuery<T> : IQuery<T>
     {
         public GetFirstQuery(ISpecification<T> specification)
-            : this(specification, fetchStrategy: new FetchAllStatery<T>(), orderCreteria: null)
+            : this(specification, fetchStrategy: null)
         {
         }
 
-        public GetFirstQuery(ISpecification<T> specification, string orderBy)
-            : this(specification, new FetchAllStatery<T>(), new OrderCreteria<T>(orderBy, OrderDirection.ASC))
+        public GetFirstQuery(params Expression<Func<T, object>>[] orderBy)
+            : this (specification: null, orderBy: orderBy)
+        {
+        }
+
+        public GetFirstQuery(IFetchStrategy<T> fetchStrategy, params Expression<Func<T, object>>[] orderBy)
+            : this(specification: null, fetchStrategy: fetchStrategy, orderBy: orderBy.Select(sortKey => new OrderCreteria<T>(sortKey, OrderDirection.ASC)).ToArray())
+        {
+        }
+
+        public GetFirstQuery(ISpecification<T> specification, params string[] orderBy)
+            : this(specification, null, orderBy.Select(sortKey => new OrderCreteria<T>(sortKey, OrderDirection.ASC)).ToArray())
         {               
         }
 
-        public GetFirstQuery(ISpecification<T> specification, Expression<Func<T, object>> orderBy)
-            : this(specification, new FetchAllStatery<T>(), new OrderCreteria<T>(orderBy, OrderDirection.ASC))
+        public GetFirstQuery(ISpecification<T> specification, params Expression<Func<T, object>>[] orderBy)
+            : this(specification, null, orderBy.Select(sortKey => new OrderCreteria<T>(sortKey, OrderDirection.ASC)).ToArray())
         {
         }
 
@@ -32,14 +43,11 @@
         {
         }
 
-        public GetFirstQuery(ISpecification<T> specification, IFetchStrategy<T> fetchStrategy, OrderCreteria<T> orderCreteria)
+        public GetFirstQuery(ISpecification<T> specification, IFetchStrategy<T> fetchStrategy, params OrderCreteria<T>[] orderBy)
         {
             Specification = specification;
             FetchStrategy = fetchStrategy;
-            if (orderCreteria != null)
-            {
-                Sorting = new OrderCreteria<T>[] { orderCreteria };
-            }
+            Sorting = orderBy;
         }
 
         public ISpecification<T> Specification { get; }
