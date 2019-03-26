@@ -12,6 +12,7 @@
         : IQueryHandler<ProjectFirstQuery<TSource, TDest>, TDest>
         , IQueryHandlerAsync<ProjectFirstQuery<TSource, TDest>, TDest>
         where TSource : class
+        where TDest : class
     {
         public ProjectFirstQueryHandler(EfDataSourceBased dataSource, IProjector projector)
         {
@@ -24,7 +25,7 @@
 
         protected IQueryable<TDest> PrepareQuery(ProjectFirstQuery<TSource, TDest> query)
         {
-            return Projector.ProjectTo<TDest>(DataSource.Query<TSource>()).MaybeWhere(query.Specification).MaybeSort(query.Sorting).ApplyFetchStrategy(query.FetchStrategy);
+            return Projector.ProjectTo<TDest>(DataSource.Query<TSource>()).MaybeWhere(query.Specification).MaybeSort(query.Sorting).ApplyFetchStrategy(query.FetchStrategy, DataSource._dbContext);
         }
 
         public TDest Request(ProjectFirstQuery<TSource, TDest> query)

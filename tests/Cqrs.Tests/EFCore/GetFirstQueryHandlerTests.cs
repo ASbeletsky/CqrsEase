@@ -1,14 +1,11 @@
 ﻿using Cqrs.Common.Queries;
 using Cqrs.Common.Queries.FetchStateries;
-using Cqrs.Core;
 using Cqrs.EntityFrameworkCore;
 using Cqrs.EntityFrameworkCore.QueryHandlers;
 using Cqrs.Tests.Model;
 using Microsoft.EntityFrameworkCore;
 using NSpecifications;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace Cqrs.Tests.EFCore
@@ -110,15 +107,75 @@ namespace Cqrs.Tests.EFCore
                 context.Blogs.Add(expectedBlog);
                 context.SaveChanges();
 
-                var someSpec = new Spec<Blog>(b => b.Id > 0);
-                var includeOnlyId = new FetchOnlyStatery<Blog>((b => b.Id));
-                var query = new GetFirstQuery<Blog>(someSpec, includeOnlyId);
+                var includeOnlyId = new FetchOnlyStratery<Blog>((b => b.Id));
+                var query = new GetFirstQuery<Blog>(includeOnlyId);
                 var queryHandler = new GetFirstQueryHandler<Blog>(new EfDataSourceBased(context));
                 var actualBlog = queryHandler.Request(query);
 
                 Assert.NotNull(actualBlog);
                 Assert.Equal(expectedBlog.Id, actualBlog.Id);
                 Assert.Null(actualBlog.Title);
+            }
+        }
+
+        [Fact]
+        public void DoesNotIncludeRelatedEntities_WhenFetchStrategyNotProvided()
+        {
+            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "DoesNotIncludeRelatedEntities_WhenFetchStrategyNotProvided").Options;
+            var context = new BloggingContext(options);
+            using (context)
+            {
+                var blog = new Blog { Title = "some title" };
+                context.Blogs.Add(blog);
+                context.SaveChanges();
+
+                var blogComments = new List<Comment>()
+                {
+                    new Comment { BlogId = blog.Id, Content = "first comment"},
+                    new Comment { BlogId = blog.Id, Content = "second comment"},
+                };
+
+                context.Comments.AddRange(blogComments);
+                context.SaveChanges();
+
+                var getFirstBlogQuery = new GetFirstQuery<Blog>(orderBy: b => b.Id);
+                var queryHandler = new GetFirstQueryHandler<Blog>(new EfDataSourceBased(context));
+                var loadedBlog = queryHandler.Request(getFirstBlogQuery);
+                var includeCommentsCalled = context.Entry(blog).Collection(b => b.Comments).IsLoaded;
+                    
+                Assert.NotNull(loadedBlog);
+                Assert.False(includeCommentsCalled);
+            }
+        }
+
+        [Fact]
+        public void IncludesRelatedEntities_WhenFetchProvided()
+        {
+            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "IncludesRelatedEntities_WhenFetchProvided").Options;
+            var context = new BloggingContext(options);
+            using (context)
+            {
+                var blog = new Blog { Title = "some title" };
+                context.Blogs.Add(blog);
+                context.SaveChanges();
+
+                var blogComments = new List<Comment>()
+                {
+                    new Comment { BlogId = blog.Id, Content = "first comment"},
+                    new Comment { BlogId = blog.Id, Content = "second comment"},
+                };
+
+                context.Comments.AddRange(blogComments);
+                context.SaveChanges();
+
+                var includeTitleAndComments = new FetchOnlyStratery<Blog>(b => b.Id, b => b.Comments);
+                var getFirstBlogQuery = new GetFirstQuery<Blog>(includeTitleAndComments, orderBy: b => b.Id);
+                var queryHandler = new GetFirstQueryHandler<Blog>(new EfDataSourceBased(context));
+                var loadedBlog = queryHandler.Request(getFirstBlogQuery);
+                var includeCommentsCalled = context.Entry(blog).Collection(b => b.Comments).IsLoaded;
+
+                Assert.NotNull(loadedBlog);
+                Assert.True(includeCommentsCalled);
             }
         }
     }

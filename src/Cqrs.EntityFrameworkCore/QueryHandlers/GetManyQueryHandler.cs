@@ -31,7 +31,7 @@
 
         protected IQueryable<T> PrepareDataQuery(GetManyQuery<T> query)
         {
-            return PrepareFilter(query).MaybeSort(query.Sorting).MaybeTake(query.Pagination).ApplyFetchStrategy(query.FetchStrategy);
+            return PrepareFilter(query).MaybeSort(query.Sorting).MaybeTake(query.Pagination).ApplyFetchStrategy(query.FetchStrategy, DataSource._dbContext);
         }
 
         public IEnumerable<T> Request(GetManyQuery<T> query)

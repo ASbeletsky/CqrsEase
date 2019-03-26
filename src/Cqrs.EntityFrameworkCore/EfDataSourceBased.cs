@@ -5,7 +5,7 @@ namespace Cqrs.EntityFrameworkCore
 {
     public class EfDataSourceBased
     {
-        private readonly DbContext _dbContext;
+        internal readonly DbContext _dbContext;
 
         public EfDataSourceBased(DbContext dbContext)
         {

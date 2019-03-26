@@ -25,7 +25,7 @@
             return DataSource.Query<TEntity>()
                 .MaybeWhere(query.Specification)
                 .MaybeSort(query.Sorting)
-                .ApplyFetchStrategy(query.FetchStrategy);
+                .ApplyFetchStrategy(query.FetchStrategy, DataSource._dbContext);
         }
 
         public TEntity Request(GetFirstQuery<TEntity> query)

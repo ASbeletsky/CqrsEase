@@ -4,6 +4,7 @@
     using Cqrs.Common.Queries;
     using Cqrs.Common.Queries.Pagination;
     using Cqrs.Common.Queries.Sorting;
+    using Microsoft.EntityFrameworkCore;
     using NSpecifications;
     using System;
     using System.Collections.Generic;
@@ -14,13 +15,27 @@
 
     internal static class IQueriableExtensions
     {
-        internal static IQueryable<T> ApplyFetchStrategy<T>(this IQueryable<T> source, IFetchStrategy<T> fetchStrategy)
+        internal static IQueryable<T> ApplyFetchStrategy<T>(this IQueryable<T> source, IFetchStrategy<T> fetchStrategy, DbContext dbContext)
+            where T : class
         {
-            if (fetchStrategy == null) throw new ArgumentNullException("fetchStrategy");
-            IProjector projector = new IQueriableProjector();
-            return projector.ProjectOnly<T>(source, fetchStrategy.FetchedPaths);
-        }
+            if (fetchStrategy != null)
+            {
+                IProjector projector = new IQueriableProjector();
+                var pathsToInclude = dbContext.Model.FindEntityType(typeof(T))
+                    .GetNavigations()
+                    .Where(p => fetchStrategy.FetchedPaths.Contains(p.Name));
 
+                foreach (var path in pathsToInclude)
+                {
+                    source = source.Include(path.Name);
+                }
+
+                return projector.ProjectOnly<T>(source, fetchStrategy.FetchedPaths);
+            }
+
+            return source;
+        }
+    
         internal static IQueryable<T> MaybeTake<T>(this IQueryable<T> source, IPage page)
         {
             if(page != null)
