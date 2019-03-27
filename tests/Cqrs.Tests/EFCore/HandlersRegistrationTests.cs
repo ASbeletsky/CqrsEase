@@ -3,6 +3,7 @@
     #region Using
     using Autofac.Extensions.DependencyInjection;
     using Cqrs.Common.Queries;
+    using Cqrs.Common.Queries.Pagination;
     using Cqrs.Core.Abstractions;
     using Cqrs.EntityFrameworkCore;
     using Cqrs.Tests.Model;
@@ -70,6 +71,26 @@
             var blogHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<GetManyQuery<Blog>, IEnumerable<Blog>>> ();
             var commentHandler = autofacServiceProvider.GetService<IQueryHandler<GetManyQuery<Comment>, IEnumerable<Comment>>>();
             var commentHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<GetManyQuery<Comment>, IEnumerable<Comment>>>();
+            Assert.NotNull(blogHandler);
+            Assert.NotNull(blogHandlerAsync);
+            Assert.NotNull(commentHandler);
+            Assert.NotNull(commentHandlerAsync);
+        }
+
+        [Fact]
+        public void RegistersPageGetManyQueryHandler()
+        {
+            var services = new ServiceCollection();
+            services.AddDbContext<BloggingContext>(o => o.UseInMemoryDatabase());
+
+            services.UseCqrsEntityFramework<BloggingContext>();
+            var defaultServiceProvider = services.BuildServiceProvider();
+            var autofacServiceProvider = defaultServiceProvider.GetService<AutofacServiceProvider>();
+
+            var blogHandler = autofacServiceProvider.GetService<IQueryHandler<GetManyQuery<Blog>, ILimitedEnumerable<Blog>>>();
+            var blogHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<GetManyQuery<Blog>, ILimitedEnumerable<Blog>>>();
+            var commentHandler = autofacServiceProvider.GetService<IQueryHandler<GetManyQuery<Comment>, ILimitedEnumerable<Comment>>>();
+            var commentHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<GetManyQuery<Comment>, ILimitedEnumerable<Comment>>>();
             Assert.NotNull(blogHandler);
             Assert.NotNull(blogHandlerAsync);
             Assert.NotNull(commentHandler);
