@@ -17,7 +17,7 @@
         [Fact]
         public void AppliesSpecification_WhenProvided()
         {
-            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "AppliesSpecification_WhenProvided").Options;
+            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "GetFirstQueryHandler_AppliesSpecification_WhenProvided").Options;
             var context = new BloggingContext(options);
             using (context)
             {
@@ -38,7 +38,7 @@
         [Fact]
         public void AppliesSorting_WhenProvided_AsString()
         {
-            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "AppliesSorting_WhenProvided_AsString").Options;
+            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "GetFirstQueryHandler_AppliesSorting_WhenProvided_AsString").Options;
             var context = new BloggingContext(options);
             using (context)
             {
@@ -59,7 +59,7 @@
         [Fact]
         public void AppliesSorting_WhenProvided_AsExpression()
         {
-            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "AppliesSorting_WhenProvided_AsExpression").Options;
+            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "GetFirstQueryHandler_AppliesSorting_WhenProvided_AsExpression").Options;
             var context = new BloggingContext(options);
             using (context)
             {
@@ -80,7 +80,7 @@
         [Fact]
         public void SelectsAllFileds_WhenFetchStrategyNotProvided()
         {
-            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "SelectsAllFileds_WhenFetchStrategyNotProvided").Options;
+            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "GetFirstQueryHandler_SelectsAllFileds_WhenFetchStrategyNotProvided").Options;
             var context = new BloggingContext(options);
             using (context)
             {
@@ -101,7 +101,7 @@
         [Fact]
         public void SelectsOnlyNeededFileds_WhenFetchStrategyProvided()
         {
-            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "SelectsOnlyNeededFileds_WhenFetchStrategyProvided").Options;
+            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "GetFirstQueryHandler_SelectsOnlyNeededFileds_WhenFetchStrategyProvided").Options;
             var context = new BloggingContext(options);
             using (context)
             {
@@ -123,7 +123,7 @@
         [Fact]
         public void DoesNotIncludeRelatedEntities_WhenFetchStrategyNotProvided()
         {
-            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "DoesNotIncludeRelatedEntities_WhenFetchStrategyNotProvided").Options;
+            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "GetFirstQueryHandler_DoesNotIncludeRelatedEntities_WhenFetchStrategyNotProvided").Options;
             var context = new BloggingContext(options);
             using (context)
             {
@@ -143,17 +143,16 @@
                 var getFirstBlogQuery = new GetFirstQuery<Blog>(orderBy: b => b.Id);
                 var queryHandler = new GetFirstQueryHandler<Blog>(new EfDataSourceBased(context));
                 var loadedBlog = queryHandler.Request(getFirstBlogQuery);
-                var includeCommentsCalled = context.Entry(blog).Collection(b => b.Comments).IsLoaded;
                     
                 Assert.NotNull(loadedBlog);
-                Assert.False(includeCommentsCalled);
+                Assert.True(blog.Comments == null || context.Entry(blog).Collection(b => b.Comments).IsLoaded == false);
             }
         }
 
         [Fact]
         public void IncludesRelatedEntities_WhenFetchProvided()
         {
-            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "IncludesRelatedEntities_WhenFetchProvided").Options;
+            var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "GetFirstQueryHandler_IncludesRelatedEntities_WhenFetchProvided").Options;
             var context = new BloggingContext(options);
             using (context)
             {
@@ -170,14 +169,15 @@
                 context.Comments.AddRange(blogComments);
                 context.SaveChanges();
 
-                var includeTitleAndComments = new FetchOnlyStratery<Blog>(b => b.Id, b => b.Comments);
-                var getFirstBlogQuery = new GetFirstQuery<Blog>(includeTitleAndComments, orderBy: b => b.Id);
+                var includeIdAndComments = new FetchOnlyStratery<Blog>(b => b.Id, b => b.Comments);
+                var getFirstBlogQuery = new GetFirstQuery<Blog>(includeIdAndComments, orderBy: b => b.Id);
                 var queryHandler = new GetFirstQueryHandler<Blog>(new EfDataSourceBased(context));
                 var loadedBlog = queryHandler.Request(getFirstBlogQuery);
-                var includeCommentsCalled = context.Entry(blog).Collection(b => b.Comments).IsLoaded;
 
                 Assert.NotNull(loadedBlog);
-                Assert.True(includeCommentsCalled);
+                Assert.Equal(blog.Id, loadedBlog.Id);
+                Assert.Null(loadedBlog.Title);
+                Assert.Equal(blogComments, loadedBlog.Comments);
             }
         }
     }
