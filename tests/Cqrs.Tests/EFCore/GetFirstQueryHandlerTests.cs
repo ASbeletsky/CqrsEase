@@ -1,15 +1,17 @@
-﻿using Cqrs.Common.Queries;
-using Cqrs.Common.Queries.FetchStateries;
-using Cqrs.EntityFrameworkCore;
-using Cqrs.EntityFrameworkCore.QueryHandlers;
-using Cqrs.Tests.Model;
-using Microsoft.EntityFrameworkCore;
-using NSpecifications;
-using System.Collections.Generic;
-using Xunit;
-
-namespace Cqrs.Tests.EFCore
+﻿namespace Cqrs.Tests.EFCore
 {
+    #region Using
+    using Cqrs.Common.Queries;
+    using Cqrs.Common.Queries.FetchStateries;
+    using Cqrs.EntityFrameworkCore.DataSource;
+    using Cqrs.EntityFrameworkCore.QueryHandlers;
+    using Cqrs.Tests.Model;
+    using Microsoft.EntityFrameworkCore;
+    using NSpecifications;
+    using System.Collections.Generic;
+    using Xunit;
+    #endregion
+
     public class GetFirstQueryHandlerTests
     {
         [Fact]

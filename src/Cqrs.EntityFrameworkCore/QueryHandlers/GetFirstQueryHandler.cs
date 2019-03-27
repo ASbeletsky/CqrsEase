@@ -3,9 +3,11 @@
     #region Using
     using Cqrs.Common.Queries;
     using Cqrs.Core.Abstractions;
+    using Cqrs.EntityFrameworkCore.DataSource;
     using Microsoft.EntityFrameworkCore;
     using System.Linq;
     using System.Threading.Tasks;
+    using static Cqrs.EntityFrameworkCore.CqrsExtensions;
     #endregion
 
     public class GetFirstQueryHandler<TEntity> 
@@ -16,6 +18,11 @@
         public GetFirstQueryHandler(EfDataSourceBased dataSource)
         {
             DataSource = dataSource;
+        }
+
+        public GetFirstQueryHandler(DataSourceFactory dataSourceFactory)
+            : this(dataSourceFactory.GetForEntity<TEntity>())
+        {
         }
 
         public EfDataSourceBased DataSource { get; }

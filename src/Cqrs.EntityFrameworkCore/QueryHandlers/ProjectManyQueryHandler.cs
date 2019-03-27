@@ -1,12 +1,15 @@
-﻿using Cqrs.Common.Queries;
-using Cqrs.Common.Queries.Pagination;
-using Cqrs.Core.Abstractions;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Cqrs.EntityFrameworkCore.QueryHandlers
+﻿namespace Cqrs.EntityFrameworkCore.QueryHandlers
 {
+    #region Using
+    using Cqrs.Common.Queries;
+    using Cqrs.Common.Queries.Pagination;
+    using Cqrs.Core.Abstractions;
+    using Cqrs.EntityFrameworkCore.DataSource;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    #endregion
+
     public class ProjectManyQueryHandler<TSource, TDest>
         : GetManyQueryHandler<TDest>
         , IQueryHandler<ProjectManyQuery<TSource, TDest>, IEnumerable<TDest>>
@@ -21,6 +24,11 @@ namespace Cqrs.EntityFrameworkCore.QueryHandlers
         public ProjectManyQueryHandler(EfDataSourceBased dataSource, IProjector projector) : base(dataSource)
         {
             Projector = projector;
+        }
+
+        public ProjectManyQueryHandler(DataSourceFactory dataSourceFactory, IProjector projector)
+            : this(dataSourceFactory.GetForEntity<TSource>(), projector)
+        {
         }
 
         protected override IQueryable<TDest> PrepareFilter(GetManyQuery<TDest> query)

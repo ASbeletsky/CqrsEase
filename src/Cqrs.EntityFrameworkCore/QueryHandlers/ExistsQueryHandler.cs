@@ -3,6 +3,7 @@
     #region Using
     using Cqrs.Common.Queries;
     using Cqrs.Core.Abstractions;
+    using Cqrs.EntityFrameworkCore.DataSource;
     using Microsoft.EntityFrameworkCore;
     using System.Linq;
     using System.Threading.Tasks;
@@ -16,6 +17,11 @@
         public ExistsQueryHandler(EfDataSourceBased dataSource)
         {
             DataSource = dataSource;
+        }
+
+        public ExistsQueryHandler(DataSourceFactory dataSourceFactory)
+            : this(dataSourceFactory.GetForEntity<T>())
+        {
         }
 
         public EfDataSourceBased DataSource { get; }

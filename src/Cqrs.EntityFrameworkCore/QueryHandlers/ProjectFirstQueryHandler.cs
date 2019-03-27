@@ -3,6 +3,7 @@
     #region Using
     using Cqrs.Common.Queries;
     using Cqrs.Core.Abstractions;
+    using Cqrs.EntityFrameworkCore.DataSource;
     using Microsoft.EntityFrameworkCore;
     using System.Linq;
     using System.Threading.Tasks;
@@ -18,6 +19,11 @@
         {
             DataSource = dataSource;
             Projector = projector;
+        }
+
+        public ProjectFirstQueryHandler(DataSourceFactory dataSourceFactory, IProjector projector)
+            : this(dataSourceFactory.GetForEntity<TSource>(), projector)
+        {
         }
 
         public EfDataSourceBased DataSource { get; }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
-namespace Cqrs.EntityFrameworkCore
+namespace Cqrs.EntityFrameworkCore.DataSource
 {
     public class EfDataSourceBased
     {

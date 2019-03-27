@@ -4,6 +4,7 @@
     using Cqrs.Common.Queries;
     using Cqrs.Common.Queries.Pagination;
     using Cqrs.Core.Abstractions;
+    using Cqrs.EntityFrameworkCore.DataSource;
     using Microsoft.EntityFrameworkCore;
     using System.Collections.Generic;
     using System.Linq;
@@ -20,6 +21,11 @@
         public GetManyQueryHandler(EfDataSourceBased dataSource)
         {
             DataSource = dataSource;
+        }
+
+        public GetManyQueryHandler(DataSourceFactory dataSourceFactory)
+            : this(dataSourceFactory.GetForEntity<T>())
+        {
         }
 
         public EfDataSourceBased DataSource { get; }
