@@ -9,7 +9,7 @@ namespace Cqrs.EntityFrameworkCore
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
-            builder.RegisterType<IQueriableProjector>()
+            builder.RegisterType<AutoMapperProjector>()
                 .As<IProjector>()
                 .InstancePerLifetimeScope();
 

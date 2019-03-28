@@ -20,7 +20,6 @@
         {
             if (fetchStrategy != null)
             {
-                IProjector projector = new IQueriableProjector();
                 var pathsToInclude = dbContext.Model.FindEntityType(typeof(T))
                     .GetNavigations()
                     .Where(p => fetchStrategy.FetchedPaths.Contains(p.Name));
@@ -30,12 +29,36 @@
                     source = source.Include(path.Name);
                 }
 
-                return projector.ProjectOnly<T>(source, fetchStrategy.FetchedPaths);
+                return source.SelectOnly<T>(fetchStrategy.FetchedPaths);
             }
 
             return source;
         }
-    
+
+        internal static IQueryable<T> SelectOnly<T>(this IQueryable<T> queryable, IEnumerable<string> paths)
+        {
+            var projectionSelector = BuildSelector<T>(paths);
+            return queryable.Select(projectionSelector).AsQueryable();
+        }
+
+        private static Func<T, T> BuildSelector<T>(IEnumerable<string> paths)
+        {
+            var lamdaParameter = Expression.Parameter(typeof(T), "x");
+            var xNew = Expression.New(typeof(T));
+            var bindings = paths.Select(o =>
+            {
+                var pathProperty = typeof(T).GetProperty(o);
+                var getPropertyExpression = Expression.Property(lamdaParameter, pathProperty);
+                // set value "Field1 = x.Field1"
+                return Expression.Bind(pathProperty, getPropertyExpression);
+            });
+
+            var xInit = Expression.MemberInit(xNew, bindings);
+            // expression "x => new T { Field1 = o.Field1, Field2 = o.Field2 }"
+            var lambda = Expression.Lambda<Func<T, T>>(xInit, lamdaParameter);
+            return lambda.Compile();
+        }
+
         internal static IQueryable<T> MaybeTake<T>(this IQueryable<T> source, IPage page)
         {
             if(page != null)
