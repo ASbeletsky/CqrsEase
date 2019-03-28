@@ -15,27 +15,40 @@
 
     internal static class IQueriableExtensions
     {
-        internal static IQueryable<T> ApplyFetchStrategy<T>(this IQueryable<T> source, IFetchStrategy<T> fetchStrategy, DbContext dbContext)
-            where T : class
+        internal static IQueryable<T> ApplyFetchStrategy<T>(this IQueryable<T> source, IFetchStrategy<T> fetchStrategy)
         {
             if (fetchStrategy != null)
             {
-                var pathsToInclude = dbContext.Model.FindEntityType(typeof(T))
-                    .GetNavigations()
-                    .Where(p => fetchStrategy.FetchedPaths.Contains(p.Name));
-
-                foreach (var path in pathsToInclude)
-                {
-                    source = source.Include(path.Name);
-                }
-
                 return source.SelectOnly<T>(fetchStrategy.FetchedPaths);
             }
 
             return source;
         }
 
-        internal static IQueryable<T> SelectOnly<T>(this IQueryable<T> queryable, IEnumerable<string> paths)
+        internal static IQueryable<T> ApplyFetchStrategy<T>(this IQueryable<T> source, IFetchStrategy<T> fetchStrategy, DbContext dbContext)
+            where T : class
+        {
+            if (fetchStrategy != null)
+            {
+                var entityType = dbContext.Model.FindEntityType(typeof(T));
+                if(entityType != null)
+                {
+                    var pathsToInclude = entityType.GetNavigations().Where(p => fetchStrategy.FetchedPaths.Contains(p.Name));
+                    foreach (var path in pathsToInclude)
+                    {
+                        source = source.Include(path.Name);
+                    }
+                }
+
+                return source.ApplyFetchStrategy(fetchStrategy);
+            }
+
+            return source;
+        }
+
+
+
+    internal static IQueryable<T> SelectOnly<T>(this IQueryable<T> queryable, IEnumerable<string> paths)
         {
             var projectionSelector = BuildSelector<T>(paths);
             return queryable.Select(projectionSelector).AsQueryable();

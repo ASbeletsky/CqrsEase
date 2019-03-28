@@ -145,7 +145,7 @@
                 var loadedBlog = queryHandler.Request(getFirstBlogQuery);
                     
                 Assert.NotNull(loadedBlog);
-                Assert.True(blog.Comments == null || context.Entry(blog).Collection(b => b.Comments).IsLoaded == false);
+                Assert.True(loadedBlog.Comments == null || context.Entry(loadedBlog).Collection(b => b.Comments).IsLoaded == false);
             }
         }
 

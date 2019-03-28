@@ -7,7 +7,7 @@
     using System.Linq;
     #endregion
 
-    internal class AutoMapperProjector : IProjector
+    public class AutoMapperProjector : IProjector
     {
         private readonly IMapper _mapper;
 

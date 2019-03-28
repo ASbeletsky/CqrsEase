@@ -2,6 +2,7 @@
 {
     #region Using
     using Cqrs.Common.Queries;
+    using Cqrs.Common.Queries.FetchStateries;
     using Cqrs.Core.Abstractions;
     using Cqrs.EntityFrameworkCore.DataSource;
     using Microsoft.EntityFrameworkCore;
@@ -10,14 +11,15 @@
     #endregion
 
     public class ProjectFirstQueryHandler<TSource, TDest>
-        : IQueryHandler<ProjectFirstQuery<TSource, TDest>, TDest>
+        : GetFirstQueryHandler<TDest>
+        , IQueryHandler<ProjectFirstQuery<TSource, TDest>, TDest>
         , IQueryHandlerAsync<ProjectFirstQuery<TSource, TDest>, TDest>
         where TSource : class
         where TDest : class
     {
         public ProjectFirstQueryHandler(EfDataSourceBased dataSource, IProjector projector)
+            : base(dataSource)
         {
-            DataSource = dataSource;
             Projector = projector;
         }
 
@@ -26,22 +28,21 @@
         {
         }
 
-        public EfDataSourceBased DataSource { get; }
         public IProjector Projector { get; }
 
-        protected IQueryable<TDest> PrepareQuery(ProjectFirstQuery<TSource, TDest> query)
+        protected override IQueryable<TDest> GetSourceCollection(GetFirstQuery<TDest> query)
         {
-            return Projector.ProjectTo<TDest>(DataSource.Query<TSource>()).MaybeWhere(query.Specification).MaybeSort(query.Sorting).ApplyFetchStrategy(query.FetchStrategy, DataSource._dbContext);
+            return Projector.ProjectTo<TDest>(DataSource.Query<TSource>());
         }
 
         public TDest Request(ProjectFirstQuery<TSource, TDest> query)
         {
-            return PrepareQuery(query).FirstOrDefault();
+            return base.Request(query);
         }
 
         public async Task<TDest> RequestAsync(ProjectFirstQuery<TSource, TDest> query)
         {
-            return await PrepareQuery(query).FirstOrDefaultAsync();
+            return await base.RequestAsync(query);
         }
     }
 }
