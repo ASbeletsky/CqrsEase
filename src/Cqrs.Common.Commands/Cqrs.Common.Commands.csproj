@@ -5,8 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NSpecifications" Version="1.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Cqrs.Core\Cqrs.Core.csproj" />
-    <ProjectReference Include="..\Cqrs.Model.Abstractions\Cqrs.Model.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>
