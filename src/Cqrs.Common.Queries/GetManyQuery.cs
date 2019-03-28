@@ -71,7 +71,7 @@
         {
         }
 
-        public GetManyQuery(FetchStrategy<T> fetchStrategy, IPage pagination, params OrderCreteria<T>[] sortingParams)
+        public GetManyQuery(IFetchStrategy<T> fetchStrategy, IPage pagination, params OrderCreteria<T>[] sortingParams)
             : this(fetchStrategy: fetchStrategy, specification: null, pagination: pagination, sorting: sortingParams)
         {
         }

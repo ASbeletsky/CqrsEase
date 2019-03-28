@@ -1,5 +1,6 @@
 ﻿namespace Cqrs.Common.Queries
 {
+    using System.Collections.Generic;
     #region Using
     using Cqrs.Common.Queries.Pagination;
     using Cqrs.Common.Queries.Sorting;
@@ -12,10 +13,13 @@
 
         public ProjectManyQuery()
         {
-
         }
 
         public ProjectManyQuery(params OrderCreteria<TDest>[] sortingParams) : base(sortingParams)
+        {
+        }
+
+        public ProjectManyQuery(FetchStrategy<TDest> fetchStrategy, params OrderCreteria<TDest>[] sortingParams) : base(fetchStrategy, sortingParams)
         {
         }
 
@@ -35,6 +39,10 @@
         {
         }
 
+        public ProjectManyQuery(IFetchStrategy<TDest> fetchStrategy, ISpecification<TDest> specification, params OrderCreteria<TDest>[] sortingParams) : base(fetchStrategy, specification, sortingParams)
+        {
+        }
+
         #endregion
 
         #region Paging use cases
@@ -47,6 +55,14 @@
         {
         }
 
+        public ProjectManyQuery(IFetchStrategy<TDest> fetchStrategy, IPage pagination, params OrderCreteria<TDest>[] sortingParams) : base(fetchStrategy, pagination, sortingParams)
+        {
+        }
+
         #endregion
+
+        public ProjectManyQuery(IFetchStrategy<TDest> fetchStrategy, ISpecification<TDest> specification, IPage pagination, IEnumerable<OrderCreteria<TDest>> sorting) : base(fetchStrategy, specification, pagination, sorting)
+        {
+        }
     }
 }

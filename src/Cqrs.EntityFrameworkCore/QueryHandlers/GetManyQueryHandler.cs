@@ -6,6 +6,7 @@
     using Cqrs.Core.Abstractions;
     using Cqrs.EntityFrameworkCore.DataSource;
     using Microsoft.EntityFrameworkCore;
+    using NSpecifications;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -30,14 +31,22 @@
 
         public EfDataSourceBased DataSource { get; }
 
-        protected virtual IQueryable<T> PrepareFilter(GetManyQuery<T> query)
+        protected virtual IQueryable<T> GetSourceCollection()
         {
-            return DataSource.Query<T>().MaybeWhere(query.Specification);
+            return DataSource.Query<T>();
+        }
+
+        protected IQueryable<T> GetFilteredSourceCollection(ISpecification<T> specification)
+        {
+            return GetSourceCollection().MaybeWhere(specification);
         }
 
         protected IQueryable<T> PrepareDataQuery(GetManyQuery<T> query)
         {
-            return PrepareFilter(query).MaybeSort(query.Sorting).MaybeTake(query.Pagination).ApplyFetchStrategy(query.FetchStrategy, DataSource._dbContext);
+            return GetFilteredSourceCollection(query.Specification)
+                .MaybeSort(query.Sorting)
+                .MaybeTake(query.Pagination)
+                .ApplyFetchStrategy(query.FetchStrategy, DataSource._dbContext);
         }
 
         public IEnumerable<T> Request(GetManyQuery<T> query)
@@ -52,14 +61,14 @@
 
         ILimitedEnumerable<T> IQueryHandler<GetManyQuery<T>, ILimitedEnumerable<T>>.Request(GetManyQuery<T> query)
         {
-            var count = PrepareFilter(query).Count();
+            var count = GetFilteredSourceCollection(query.Specification).Count();
             IEnumerable<T> data = count > 0 ? Request(query) : Enumerable.Empty<T>();
             return new LimitedEnumerable<T>(data, count);
         }
 
         async Task<ILimitedEnumerable<T>> IQueryHandlerAsync<GetManyQuery<T>, ILimitedEnumerable<T>>.RequestAsync(GetManyQuery<T> query)
         {
-            var count = await PrepareFilter(query).CountAsync();
+            var count = await GetFilteredSourceCollection(query.Specification).CountAsync();
             IEnumerable<T> data = count > 0 ? await RequestAsync(query) : Enumerable.Empty<T>();
             return new LimitedEnumerable<T>(data, count);
         }

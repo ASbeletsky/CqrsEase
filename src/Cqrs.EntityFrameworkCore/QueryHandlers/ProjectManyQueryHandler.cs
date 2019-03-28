@@ -5,6 +5,7 @@
     using Cqrs.Common.Queries.Pagination;
     using Cqrs.Core.Abstractions;
     using Cqrs.EntityFrameworkCore.DataSource;
+    using NSpecifications;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -31,9 +32,9 @@
         {
         }
 
-        protected override IQueryable<TDest> PrepareFilter(GetManyQuery<TDest> query)
+        protected override IQueryable<TDest> GetSourceCollection()
         {
-            return Projector.ProjectTo<TDest>(DataSource.Query<TSource>()).MaybeWhere(query.Specification);
+            return Projector.ProjectTo<TDest>(DataSource.Query<TSource>());
         }
 
         public IEnumerable<TDest> Request(ProjectManyQuery<TSource, TDest> query)
