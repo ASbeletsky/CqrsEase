@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NSpecifications;
 using System.Linq;
+using System.Reflection;
 
 namespace Cqrs.EntityFrameworkCore.DataSource
 {
@@ -31,10 +32,28 @@ namespace Cqrs.EntityFrameworkCore.DataSource
             var entitiesToUpdate = Query<T>().MaybeWhere(applyTo).ToList();
             if(entitiesToUpdate != null && entitiesToUpdate.Any())
             {
-                throw new System.NotImplementedException();
+                foreach (var entity in entitiesToUpdate)
+                {
+                    SetValues(entity, value);
+                    updatedCount++;
+                }
+
+                _dbContext.SaveChanges();
             }
 
             return updatedCount;
+        }
+
+        private void SetValues<T>(T from, T to) where T : class
+        {
+            var entityType = from.GetType();
+            var entry = _dbContext.Entry(from);
+            var propertiesToSet = _dbContext.Model.FindEntityType(entityType)
+                .GetProperties()
+                .Where(p => !p.IsPrimaryKey())
+                .ToDictionary(p => p.Name, p => entityType.GetProperty(p.Name).GetValue(to));
+
+            entry.CurrentValues.SetValues(values: propertiesToSet);
         }
 
         public int Delete<T>(ISpecification<T> applyTo) where T : class

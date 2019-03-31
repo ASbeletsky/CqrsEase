@@ -16,11 +16,14 @@ namespace Cqrs.Tests.EFCore
 
         public DbSet<Blog> Blogs { get; set; }
 
+        public DbSet<Author> Authors { get; set; }
+
         public DbSet<Comment> Comments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Blog>().HasOne(b => b.Author).WithMany(a => a.Blogs).HasForeignKey(b => b.AuthorId);
             modelBuilder.Entity<Blog>().HasMany(b => b.Comments).WithOne().HasForeignKey(c => c.BlogId);
         }
     }
