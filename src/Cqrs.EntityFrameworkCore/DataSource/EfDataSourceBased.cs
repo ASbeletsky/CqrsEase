@@ -1,11 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
-using NSpecifications;
-using System.Linq;
-using System.Reflection;
-
-namespace Cqrs.EntityFrameworkCore.DataSource
+﻿namespace Cqrs.EntityFrameworkCore.DataSource
 {
-    public class EfDataSourceBased : IQueryableDataSource, IModifiableDataSource
+    #region Using
+    using Microsoft.EntityFrameworkCore;
+    using NSpecifications;
+    using System.Linq;
+    using System.Reflection;
+    using System.Threading.Tasks;
+    #endregion
+
+    public class EfDataSourceBased : IQueryableDataSource, IModifiableDataSource, IAsyncModifiableDataSource
     {
         internal readonly DbContext _dbContext;
 
@@ -18,6 +21,8 @@ namespace Cqrs.EntityFrameworkCore.DataSource
         {
             return _dbContext.Set<T>();
         }
+
+        #region IModifiableDataSource members
 
         public T Create<T>(T value) where T : class
         {
@@ -58,7 +63,69 @@ namespace Cqrs.EntityFrameworkCore.DataSource
 
         public int Delete<T>(ISpecification<T> applyTo) where T : class
         {
-            throw new System.NotImplementedException();
+            int deletedCount = 0;
+            var entitiesToDelete = Query<T>().MaybeWhere(applyTo).ToList();
+            if (entitiesToDelete != null && entitiesToDelete.Any())
+            {
+                foreach (var entity in entitiesToDelete)
+                {
+                    _dbContext.Set<T>().Remove(entity);
+                    deletedCount++;
+                }
+
+                _dbContext.SaveChanges();
+            }
+
+            return deletedCount;
         }
+
+        #endregion
+
+        #region IAsyncModifiableDataSource members
+
+        async Task<T> IAsyncModifiableDataSource.Create<T>(T value) 
+        {
+            _dbContext.Add<T>(value);
+            await _dbContext.SaveChangesAsync();
+            return value;
+        }
+
+        async Task<int> IAsyncModifiableDataSource.Update<T>(ISpecification<T> applyTo, T value)
+        {
+            int updatedCount = 0;
+            var entitiesToUpdate = await Query<T>().MaybeWhere(applyTo).ToListAsync();
+            if (entitiesToUpdate != null && entitiesToUpdate.Any())
+            {
+                foreach (var entity in entitiesToUpdate)
+                {
+                    SetValues(entity, value);
+                    updatedCount++;
+                }
+
+                await _dbContext.SaveChangesAsync();
+            }
+
+            return updatedCount;
+        }
+
+        async Task<int> IAsyncModifiableDataSource.Delete<T>(ISpecification<T> applyTo)
+        {
+            int deletedCount = 0;
+            var entitiesToDelete = await Query<T>().MaybeWhere(applyTo).ToListAsync();
+            if (entitiesToDelete != null && entitiesToDelete.Any())
+            {
+                foreach (var entity in entitiesToDelete)
+                {
+                    _dbContext.Set<T>().Remove(entity);
+                    deletedCount++;
+                }
+
+                await _dbContext.SaveChangesAsync();
+            }
+
+            return deletedCount;
+        }
+
+        #endregion
     }
 }
