@@ -5,10 +5,10 @@
 
     public interface IAsyncModifiableDataSource
     {
-        Task<T> Create<T>(T value) where T : class;
+        Task<T> CreateAsync<T>(T value) where T : class;
 
-        Task<int> Update<T>(ISpecification<T> applyTo, T value) where T : class;
+        Task<int> UpdateAsync<T>(ISpecification<T> applyTo, T value) where T : class;
 
-        Task<int> Delete<T>(ISpecification<T> applyTo) where T : class;
+        Task<int> DeleteAsync<T>(ISpecification<T> applyTo) where T : class;
     }
 }

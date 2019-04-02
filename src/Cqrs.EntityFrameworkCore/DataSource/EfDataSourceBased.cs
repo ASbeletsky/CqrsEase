@@ -83,14 +83,14 @@
 
         #region IAsyncModifiableDataSource members
 
-        async Task<T> IAsyncModifiableDataSource.Create<T>(T value) 
+        public async Task<T> CreateAsync<T>(T value) where T : class
         {
             _dbContext.Add<T>(value);
             await _dbContext.SaveChangesAsync();
             return value;
         }
 
-        async Task<int> IAsyncModifiableDataSource.Update<T>(ISpecification<T> applyTo, T value)
+        public async Task<int> UpdateAsync<T>(ISpecification<T> applyTo, T value) where T : class
         {
             int updatedCount = 0;
             var entitiesToUpdate = await Query<T>().MaybeWhere(applyTo).ToListAsync();
@@ -108,7 +108,7 @@
             return updatedCount;
         }
 
-        async Task<int> IAsyncModifiableDataSource.Delete<T>(ISpecification<T> applyTo)
+        public async Task<int> DeleteAsync<T>(ISpecification<T> applyTo) where T : class
         {
             int deletedCount = 0;
             var entitiesToDelete = await Query<T>().MaybeWhere(applyTo).ToListAsync();
