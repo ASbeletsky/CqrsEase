@@ -2,7 +2,10 @@
 {
     using Cqrs.Core.Abstractions;
 
-    public class CreateCommand<T> : ICommand
+    public class CreateCommand<T>
+        : ICommand
+        , ICommand<ICreateResult<T>>
+        where T : class
     {
         public CreateCommand(T value)
         {
@@ -10,12 +13,5 @@
         }
 
         public T Value { get; }
-    }
-
-    public class CreateCommand<T, TResult> : CreateCommand<T>, ICommand<TResult>
-    {
-        public CreateCommand(T value) : base(value)
-        {
-        }
-    }
+    }  
 }

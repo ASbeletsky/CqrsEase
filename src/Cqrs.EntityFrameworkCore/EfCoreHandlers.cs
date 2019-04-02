@@ -1,9 +1,12 @@
-﻿using Autofac;
-using Cqrs.EntityFrameworkCore.DataSource;
-using Cqrs.EntityFrameworkCore.QueryHandlers;
-
-namespace Cqrs.EntityFrameworkCore
+﻿namespace Cqrs.EntityFrameworkCore
 {
+    #region Using
+    using Autofac;
+    using Cqrs.EntityFrameworkCore.CommandHandlers;
+    using Cqrs.EntityFrameworkCore.DataSource;
+    using Cqrs.EntityFrameworkCore.QueryHandlers;
+    #endregion
+
     internal class EfCoreHandlers : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
@@ -44,6 +47,12 @@ namespace Cqrs.EntityFrameworkCore
                 .InstancePerLifetimeScope();
 
             builder.RegisterGeneric(typeof(CountQueryHandler<>))
+                .AsImplementedInterfaces()
+                .UsingConstructor(typeof(DataSourceFactory))
+                .WithParameter((param, ctx) => param.Name == "dataSourceFactory", (param, ctx) => ctx.Resolve<DataSourceFactory>())
+                .InstancePerLifetimeScope();
+
+            builder.RegisterGeneric(typeof(CreateCommandHandler<>))
                 .AsImplementedInterfaces()
                 .UsingConstructor(typeof(DataSourceFactory))
                 .WithParameter((param, ctx) => param.Name == "dataSourceFactory", (param, ctx) => ctx.Resolve<DataSourceFactory>())
