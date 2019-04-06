@@ -7,8 +7,12 @@
     {
         Task<T> CreateAsync<T>(T value) where T : class;
 
-        Task<int> UpdateAsync<T>(ISpecification<T> applyTo, T value) where T : class;
+        Task<bool> UpdateFirstAsync<T>(ISpecification<T> applyTo, T value) where T : class;
 
-        Task<int> DeleteAsync<T>(ISpecification<T> applyTo) where T : class;
+        Task<int> UpdateRangeAsync<T>(ISpecification<T> applyTo, T value) where T : class;
+
+        Task<bool> DeleteFirstAsync<T>(ISpecification<T> applyTo) where T : class;
+
+        Task<int> DeleteRangeAsync<T>(ISpecification<T> applyTo) where T : class;
     }
 }

@@ -31,7 +31,21 @@
             return value;
         }
 
-        public int Update<T>(ISpecification<T> applyTo, T value) where T : class
+        public bool UpdateFirst<T>(ISpecification<T> applyTo, T value) where T : class
+        {
+            bool isUpdated = false;
+            var entityToUpdate = Query<T>().MaybeWhere(applyTo).FirstOrDefault();
+            if(entityToUpdate != null)
+            {
+                SetValues(entityToUpdate, value);
+                isUpdated = true;
+                _dbContext.SaveChanges();
+            }
+
+            return isUpdated;
+        }
+
+        public int UpdateRange<T>(ISpecification<T> applyTo, T value) where T : class
         {
             int updatedCount = 0;
             var entitiesToUpdate = Query<T>().MaybeWhere(applyTo).ToList();
@@ -61,7 +75,21 @@
             entry.CurrentValues.SetValues(values: propertiesToSet);
         }
 
-        public int Delete<T>(ISpecification<T> applyTo) where T : class
+        public bool DeleteFirst<T>(ISpecification<T> applyTo) where T : class
+        {
+            bool isDeleted = false;
+            var entityToUpdate = Query<T>().MaybeWhere(applyTo).FirstOrDefault();
+            if(entityToUpdate != null)
+            {
+                _dbContext.Entry(entityToUpdate).State = EntityState.Deleted;
+                _dbContext.SaveChanges();
+                isDeleted = true;
+            }
+
+            return isDeleted;
+        }
+
+        public int DeleteRange<T>(ISpecification<T> applyTo) where T : class
         {
             int deletedCount = 0;
             var entitiesToDelete = Query<T>().MaybeWhere(applyTo).ToList();
@@ -90,7 +118,21 @@
             return value;
         }
 
-        public async Task<int> UpdateAsync<T>(ISpecification<T> applyTo, T value) where T : class
+        public async Task<bool> UpdateFirstAsync<T>(ISpecification<T> applyTo, T value) where T : class
+        {
+            bool isUpdated = false;
+            var entityToUpdate = await Query<T>().MaybeWhere(applyTo).FirstOrDefaultAsync();
+            if (entityToUpdate != null)
+            {
+                SetValues(entityToUpdate, value);
+                isUpdated = true;
+                await _dbContext.SaveChangesAsync();
+            }
+
+            return isUpdated;
+        }
+
+        public async Task<int> UpdateRangeAsync<T>(ISpecification<T> applyTo, T value) where T : class
         {
             int updatedCount = 0;
             var entitiesToUpdate = await Query<T>().MaybeWhere(applyTo).ToListAsync();
@@ -108,7 +150,21 @@
             return updatedCount;
         }
 
-        public async Task<int> DeleteAsync<T>(ISpecification<T> applyTo) where T : class
+        public async Task<bool> DeleteFirstAsync<T>(ISpecification<T> applyTo) where T : class
+        {
+            bool isDeleted = false;
+            var entityToUpdate = await Query<T>().MaybeWhere(applyTo).FirstOrDefaultAsync();
+            if (entityToUpdate != null)
+            {
+                _dbContext.Entry(entityToUpdate).State = EntityState.Deleted;
+                await _dbContext.SaveChangesAsync();
+                isDeleted = true;
+            }
+
+            return isDeleted;
+        }
+
+        public async Task<int> DeleteRangeAsync<T>(ISpecification<T> applyTo) where T : class
         {
             int deletedCount = 0;
             var entitiesToDelete = await Query<T>().MaybeWhere(applyTo).ToListAsync();
