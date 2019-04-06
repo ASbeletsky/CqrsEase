@@ -1,6 +1,6 @@
 ﻿namespace Cqrs.Common.Commands
 {
-    public class ICreateResult<T>
+    public interface ICreateResult<T>
     {
         T CreatedValue { get; }
     }
