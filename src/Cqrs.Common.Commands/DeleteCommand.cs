@@ -3,20 +3,17 @@
     using Cqrs.Core.Abstractions;
     using NSpecifications;
 
-    public class DeleteCommand<T> : ICommand
+    public class DeleteCommand<T>
+        : ICommand
+        , ICommand<IDeleteResult>
     {
-        public DeleteCommand(ISpecification<T> applyTo)
+        public DeleteCommand(ISpecification<T> applyTo, bool deleteFirstMatchOnly = true)
         {
             ApplyTo = applyTo;
+            DeleteFirstMatchOnly = deleteFirstMatchOnly;
         }
 
         public ISpecification<T> ApplyTo { get; }
-    }
-
-    public class DeleteCommand<T, TResult> : DeleteCommand<T>, ICommand<TResult>
-    {
-        public DeleteCommand(ISpecification<T> applyTo) : base(applyTo)
-        {
-        }
+        public bool DeleteFirstMatchOnly { get; }
     }
 }
