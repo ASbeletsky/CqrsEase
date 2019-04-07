@@ -11,6 +11,8 @@ namespace Cqrs.Tests
             CreateMap<Blog, BlogDto>()
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
                 .ForMember(d => d.Comments, o => o.MapFrom(s => s.Comments.Select(c => c.Content)));
+
+            CreateMap<BlogDto, Blog>();
         }
     }
 }
