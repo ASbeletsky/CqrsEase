@@ -2,6 +2,7 @@
 {
     #region Using
     using Autofac.Extensions.DependencyInjection;
+    using Cqrs.Common.Commands;
     using Cqrs.Common.Queries;
     using Cqrs.Common.Queries.Pagination;
     using Cqrs.Core.Abstractions;
@@ -158,6 +159,61 @@
             Assert.NotNull(blogHandlerAsync);
             Assert.NotNull(commentHandler);
             Assert.NotNull(commentHandlerAsync);
+        }
+
+        [Fact]
+        public void RegistersCreateCommandHandler()
+        {
+            var services = new ServiceCollection();
+            services.AddDbContext<BloggingContext>(o => o.UseInMemoryDatabase());
+
+            services.UseCqrsEntityFramework<BloggingContext>();
+            var defaultServiceProvider = services.BuildServiceProvider();
+            var autofacServiceProvider = defaultServiceProvider.GetService<AutofacServiceProvider>();
+           
+            var blogHandler = autofacServiceProvider.GetService<ICommandHandler<CreateCommand<Blog>, ICreateResult<Blog>>>();           
+            var blogHandlerAsync = autofacServiceProvider.GetService<ICommandHandlerAsync<CreateCommand<Blog>, ICreateResult<Blog>>>();
+
+            Assert.NotNull(blogHandler);
+            Assert.NotNull(blogHandlerAsync);
+        }
+
+        [Fact]
+        public void RegistersUpdateCommandHandler()
+        {
+            var services = new ServiceCollection();
+            services.AddDbContext<BloggingContext>(o => o.UseInMemoryDatabase());
+
+            services.UseCqrsEntityFramework<BloggingContext>();
+            var defaultServiceProvider = services.BuildServiceProvider();
+            var autofacServiceProvider = defaultServiceProvider.GetService<AutofacServiceProvider>();
+
+            var blogHandler = autofacServiceProvider.GetService<ICommandHandler<UpdateCommand<Blog>, IUpdateResult>>();
+            var projectedBlogHandler = autofacServiceProvider.GetService<ICommandHandler<UpdateCommand<Blog, BlogDto>, IUpdateResult>>();
+            var blogHandlerAsync = autofacServiceProvider.GetService<ICommandHandlerAsync<UpdateCommand<Blog>, IUpdateResult>>();
+            var projectedBlogHandlerAsync = autofacServiceProvider.GetService<ICommandHandlerAsync<UpdateCommand<Blog, BlogDto>, IUpdateResult>>();
+
+            Assert.NotNull(blogHandler);
+            Assert.NotNull(projectedBlogHandler);
+            Assert.NotNull(blogHandlerAsync);
+            Assert.NotNull(projectedBlogHandlerAsync);
+        }
+
+        [Fact]
+        public void RegistersDeleteCommandHandler()
+        {
+            var services = new ServiceCollection();
+            services.AddDbContext<BloggingContext>(o => o.UseInMemoryDatabase());
+
+            services.UseCqrsEntityFramework<BloggingContext>();
+            var defaultServiceProvider = services.BuildServiceProvider();
+            var autofacServiceProvider = defaultServiceProvider.GetService<AutofacServiceProvider>();
+
+            var blogHandler = autofacServiceProvider.GetService<ICommandHandler<DeleteCommand<Blog>, IDeleteResult>>();
+            var blogHandlerAsync = autofacServiceProvider.GetService<ICommandHandlerAsync<DeleteCommand<Blog>, IDeleteResult>>();
+           
+            Assert.NotNull(blogHandler);
+            Assert.NotNull(blogHandlerAsync);
         }
     }
 }

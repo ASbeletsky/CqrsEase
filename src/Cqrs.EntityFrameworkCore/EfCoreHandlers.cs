@@ -2,6 +2,7 @@
 {
     #region Using
     using Autofac;
+    using AutoMapper;
     using Cqrs.EntityFrameworkCore.CommandHandlers;
     using Cqrs.EntityFrameworkCore.DataSource;
     using Cqrs.EntityFrameworkCore.QueryHandlers;
@@ -55,6 +56,24 @@
             builder.RegisterGeneric(typeof(CreateCommandHandler<>))
                 .AsImplementedInterfaces()
                 .UsingConstructor(typeof(DataSourceFactory))
+                .WithParameter((param, ctx) => param.Name == "dataSourceFactory", (param, ctx) => ctx.Resolve<DataSourceFactory>())
+                .InstancePerLifetimeScope();
+
+            builder.RegisterGeneric(typeof(UpdateCommandHandler<>))
+                .AsImplementedInterfaces()
+                .UsingConstructor(typeof(DataSourceFactory))
+                .WithParameter((param, ctx) => param.Name == "dataSourceFactory", (param, ctx) => ctx.Resolve<DataSourceFactory>())
+                .InstancePerLifetimeScope();
+
+            builder.RegisterGeneric(typeof(UpdateCommandHandler<,>))
+                .AsImplementedInterfaces()
+                .UsingConstructor(typeof(DataSourceFactory), typeof(IMapper))
+                .WithParameter((param, ctx) => param.Name == "dataSourceFactory", (param, ctx) => ctx.Resolve<DataSourceFactory>())
+                .WithParameter((param, ctx) => param.Name == "mapper", (param, ctx) => ctx.Resolve<IMapper>())
+                .InstancePerLifetimeScope();
+
+            builder.RegisterGeneric(typeof(DeleteCommandHandler<>))
+                .AsImplementedInterfaces()
                 .WithParameter((param, ctx) => param.Name == "dataSourceFactory", (param, ctx) => ctx.Resolve<DataSourceFactory>())
                 .InstancePerLifetimeScope();
         }
