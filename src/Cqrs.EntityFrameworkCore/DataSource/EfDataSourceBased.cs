@@ -3,6 +3,7 @@
     #region Using
     using Microsoft.EntityFrameworkCore;
     using NSpecifications;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
@@ -34,6 +35,12 @@
             _dbContext.Add<T>(value);        
             _dbContext.SaveChanges();
             return value;
+        }
+
+        public void CreateRange<T>(IEnumerable<T> values) where T : class
+        {
+            _dbContext.AddRange(values);
+            _dbContext.SaveChanges();
         }
 
         public bool UpdateFirst<T>(ISpecification<T> applyTo, T value) where T : class
@@ -129,13 +136,19 @@
 
         #endregion
 
-        #region IAsyncModifiableDataSource members
+        #region IModifiableDataSourceAsync members
 
         public async Task<T> CreateAsync<T>(T value) where T : class
         {
             _dbContext.Add<T>(value);
             await _dbContext.SaveChangesAsync();
             return value;
+        }
+
+        public async Task CreateRangeAsync<T>(IEnumerable<T> values) where T : class
+        {
+            _dbContext.AddRange(values);
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<bool> UpdateFirstAsync<T>(ISpecification<T> applyTo, T value) where T : class
