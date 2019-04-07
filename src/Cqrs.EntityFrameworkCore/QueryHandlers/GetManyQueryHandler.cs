@@ -31,14 +31,9 @@
 
         public EfDataSourceBased DataSource { get; }
 
-        protected virtual IQueryable<T> GetSourceCollection()
-        {
-            return DataSource.Query<T>();
-        }
-
         protected IQueryable<T> GetFilteredSourceCollection(ISpecification<T> specification)
         {
-            return GetSourceCollection().MaybeWhere(specification);
+            return DataSource.Query<T>().MaybeWhere(specification);
         }
 
         protected IQueryable<T> PrepareDataQuery(GetManyQuery<T> query)

@@ -11,15 +11,14 @@
     #endregion
 
     public class ProjectFirstQueryHandler<TSource, TDest>
-        : GetFirstQueryHandler<TDest>
-        , IQueryHandler<ProjectFirstQuery<TSource, TDest>, TDest>
+        : IQueryHandler<ProjectFirstQuery<TSource, TDest>, TDest>
         , IQueryHandlerAsync<ProjectFirstQuery<TSource, TDest>, TDest>
         where TSource : class
         where TDest : class
     {
         public ProjectFirstQueryHandler(EfDataSourceBased dataSource, IProjector projector)
-            : base(dataSource)
         {
+            DataSource = dataSource;
             Projector = projector;
         }
 
@@ -28,21 +27,25 @@
         {
         }
 
+        public EfDataSourceBased DataSource { get; }
         public IProjector Projector { get; }
 
-        protected override IQueryable<TDest> GetSourceCollection(GetFirstQuery<TDest> query)
+        protected IQueryable<TDest> PrepareQuery(ProjectFirstQuery<TSource, TDest> query)
         {
-            return Projector.ProjectTo<TDest>(DataSource.Query<TSource>());
+            return Projector.ProjectTo<TDest>(DataSource.Query<TSource>())
+                .MaybeWhere(query.Specification)
+                .MaybeSort(query.Sorting)
+                .ApplyFetchStrategy(query.FetchStrategy, DataSource._dbContext);
         }
 
         public TDest Request(ProjectFirstQuery<TSource, TDest> query)
         {
-            return base.Request(query);
+            return PrepareQuery(query).FirstOrDefault();
         }
 
         public async Task<TDest> RequestAsync(ProjectFirstQuery<TSource, TDest> query)
         {
-            return await base.RequestAsync(query);
+            return await PrepareQuery(query).FirstOrDefaultAsync();
         }
     }
 }

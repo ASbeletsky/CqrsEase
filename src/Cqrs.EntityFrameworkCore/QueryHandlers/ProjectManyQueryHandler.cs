@@ -5,6 +5,7 @@
     using Cqrs.Common.Queries.Pagination;
     using Cqrs.Core.Abstractions;
     using Cqrs.EntityFrameworkCore.DataSource;
+    using Microsoft.EntityFrameworkCore;
     using NSpecifications;
     using System.Collections.Generic;
     using System.Linq;
@@ -12,18 +13,19 @@
     #endregion
 
     public class ProjectManyQueryHandler<TSource, TDest>
-        : GetManyQueryHandler<TDest>
-        , IQueryHandler<ProjectManyQuery<TSource, TDest>, IEnumerable<TDest>>
+        : IQueryHandler<ProjectManyQuery<TSource, TDest>, IEnumerable<TDest>>
         , IQueryHandler<ProjectManyQuery<TSource, TDest>, ILimitedEnumerable<TDest>>
         , IQueryHandlerAsync<ProjectManyQuery<TSource, TDest>, IEnumerable<TDest>>
         , IQueryHandlerAsync<ProjectManyQuery<TSource, TDest>, ILimitedEnumerable<TDest>>
         where TSource : class
         where TDest : class
     {
+        public EfDataSourceBased DataSource { get; }
         public IProjector Projector { get; }
 
-        public ProjectManyQueryHandler(EfDataSourceBased dataSource, IProjector projector) : base(dataSource)
+        public ProjectManyQueryHandler(EfDataSourceBased dataSource, IProjector projector)
         {
+            DataSource = dataSource;
             Projector = projector;
         }
 
@@ -32,29 +34,42 @@
         {
         }
 
-        protected override IQueryable<TDest> GetSourceCollection()
+
+        protected IQueryable<TDest> GetFilteredSourceCollection(ISpecification<TDest> specification)
         {
-            return Projector.ProjectTo<TDest>(DataSource.Query<TSource>());
+            return Projector.ProjectTo<TDest>(DataSource.Query<TSource>()).MaybeWhere(specification);
+        }
+
+        protected IQueryable<TDest> PrepareDataQuery(GetManyQuery<TDest> query)
+        {
+            return GetFilteredSourceCollection(query.Specification)
+                .MaybeSort(query.Sorting)
+                .MaybeTake(query.Pagination)
+                .ApplyFetchStrategy(query.FetchStrategy, DataSource._dbContext);
         }
 
         public IEnumerable<TDest> Request(ProjectManyQuery<TSource, TDest> query)
         {
-            return base.Request(query);
+            return PrepareDataQuery(query).ToList();
         }
 
         public async Task<IEnumerable<TDest>> RequestAsync(ProjectManyQuery<TSource, TDest> query)
         {
-            return await base.RequestAsync(query);
+            return await PrepareDataQuery(query).ToListAsync();
         }
 
         ILimitedEnumerable<TDest> IQueryHandler<ProjectManyQuery<TSource, TDest>, ILimitedEnumerable<TDest>>.Request(ProjectManyQuery<TSource, TDest> query)
         {
-            return (this as IQueryHandler<GetManyQuery<TDest>, ILimitedEnumerable<TDest>>).Request(query);
+            var count = GetFilteredSourceCollection(query.Specification).Count();
+            IEnumerable<TDest> data = count > 0 ? Request(query) : Enumerable.Empty<TDest>();
+            return new LimitedEnumerable<TDest>(data, count);
         }
 
         async Task<ILimitedEnumerable<TDest>> IQueryHandlerAsync<ProjectManyQuery<TSource, TDest>, ILimitedEnumerable<TDest>>.RequestAsync(ProjectManyQuery<TSource, TDest> query)
         {
-            return await (this as IQueryHandlerAsync<GetManyQuery<TDest>, ILimitedEnumerable<TDest>>).RequestAsync(query);
+            var count = await GetFilteredSourceCollection(query.Specification).CountAsync();
+            IEnumerable<TDest> data = count > 0 ? await RequestAsync(query) : Enumerable.Empty<TDest>();
+            return new LimitedEnumerable<TDest>(data, count);
         }
     }
 }

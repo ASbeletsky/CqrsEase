@@ -27,14 +27,9 @@
 
         public EfDataSourceBased DataSource { get; }
 
-        protected virtual IQueryable<TEntity> GetSourceCollection(GetFirstQuery<TEntity> query)
-        {
-            return DataSource.Query<TEntity>();
-        }
-
         protected IQueryable<TEntity> PrepareQuery(GetFirstQuery<TEntity> query)
         {
-            return GetSourceCollection(query)
+            return DataSource.Query<TEntity>()
                 .MaybeWhere(query.Specification)
                 .MaybeSort(query.Sorting)
                 .ApplyFetchStrategy(query.FetchStrategy, DataSource._dbContext);
