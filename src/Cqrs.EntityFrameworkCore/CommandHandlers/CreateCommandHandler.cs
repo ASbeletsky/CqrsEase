@@ -22,7 +22,7 @@
         {
         }
 
-        internal EfDataSourceBased DataSource { get; }
+        public EfDataSourceBased DataSource { get; }
 
         public ICreateResult<T> Apply(CreateCommand<T> command)
         {
