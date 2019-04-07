@@ -7,6 +7,8 @@
     using Cqrs.Common.Queries.Pagination;
     using Cqrs.Core.Abstractions;
     using Cqrs.EntityFrameworkCore;
+    using Cqrs.EntityFrameworkCore.CommandHandlers;
+    using Cqrs.EntityFrameworkCore.QueryHandlers;
     using Cqrs.Tests.Model;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
@@ -28,13 +30,13 @@
 
             var blogHandler = autofacServiceProvider.GetService<IQueryHandler<GetFirstQuery<Blog>, Blog>>();
             var blogHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<GetFirstQuery<Blog>, Blog>>();
-            var commentHandler = autofacServiceProvider.GetService<IQueryHandler<GetFirstQuery<Comment>, Comment>>();
-            var commentHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<GetFirstQuery<Comment>, Comment>>();
 
             Assert.NotNull(blogHandler);
             Assert.NotNull(blogHandlerAsync);
-            Assert.NotNull(commentHandler);
-            Assert.NotNull(commentHandlerAsync);
+            Assert.Equal(typeof(GetFirstQueryHandler<Blog>), blogHandler.GetType());
+            Assert.Equal(typeof(GetFirstQueryHandler<Blog>), blogHandlerAsync.GetType());
+            Assert.NotNull((blogHandler as GetFirstQueryHandler<Blog>).DataSource);
+            Assert.NotNull((blogHandlerAsync as GetFirstQueryHandler<Blog>).DataSource);
         }
 
         [Fact]
@@ -47,15 +49,17 @@
             var defaultServiceProvider = services.BuildServiceProvider();
             var autofacServiceProvider = defaultServiceProvider.GetService<AutofacServiceProvider>();
 
-            var blogHandler = autofacServiceProvider.GetService<IQueryHandler<ProjectFirstQuery<Blog, Blog>, Blog>>();
-            var blogHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<ProjectFirstQuery<Blog, Blog>, Blog>>();
-            var commentHandler = autofacServiceProvider.GetService<IQueryHandler<ProjectFirstQuery<Comment, Comment>, Comment>>();
-            var commentHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<ProjectFirstQuery<Comment, Comment>, Comment>>();
+            var blogHandler = autofacServiceProvider.GetService<IQueryHandler<ProjectFirstQuery<Blog, BlogDto>, BlogDto>>();
+            var blogHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<ProjectFirstQuery<Blog, BlogDto>, BlogDto>>();
 
             Assert.NotNull(blogHandler);
             Assert.NotNull(blogHandlerAsync);
-            Assert.NotNull(commentHandler);
-            Assert.NotNull(commentHandlerAsync);
+            Assert.Equal(typeof(ProjectFirstQueryHandler<Blog, BlogDto>), blogHandler.GetType());
+            Assert.Equal(typeof(ProjectFirstQueryHandler<Blog, BlogDto>), blogHandlerAsync.GetType());
+            Assert.NotNull((blogHandler as ProjectFirstQueryHandler<Blog, BlogDto>).DataSource);
+            Assert.NotNull((blogHandler as ProjectFirstQueryHandler<Blog, BlogDto>).Projector);
+            Assert.NotNull((blogHandlerAsync as ProjectFirstQueryHandler<Blog, BlogDto>).DataSource);
+            Assert.NotNull((blogHandlerAsync as ProjectFirstQueryHandler<Blog, BlogDto>).Projector);
         }
 
         [Fact]
@@ -70,16 +74,17 @@
 
             var blogHandler = autofacServiceProvider.GetService<IQueryHandler<GetManyQuery<Blog>, IEnumerable<Blog>>>();
             var blogHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<GetManyQuery<Blog>, IEnumerable<Blog>>> ();
-            var commentHandler = autofacServiceProvider.GetService<IQueryHandler<GetManyQuery<Comment>, IEnumerable<Comment>>>();
-            var commentHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<GetManyQuery<Comment>, IEnumerable<Comment>>>();
+
             Assert.NotNull(blogHandler);
             Assert.NotNull(blogHandlerAsync);
-            Assert.NotNull(commentHandler);
-            Assert.NotNull(commentHandlerAsync);
+            Assert.Equal(typeof(GetManyQueryHandler<Blog>), blogHandler.GetType());
+            Assert.Equal(typeof(GetManyQueryHandler<Blog>), blogHandlerAsync.GetType());
+            Assert.NotNull((blogHandler as GetManyQueryHandler<Blog>).DataSource);
+            Assert.NotNull((blogHandlerAsync as GetManyQueryHandler<Blog>).DataSource);
         }
 
         [Fact]
-        public void RegistersPageGetManyQueryHandler()
+        public void RegistersPagedGetManyQueryHandler()
         {
             var services = new ServiceCollection();
             services.AddDbContext<BloggingContext>(o => o.UseInMemoryDatabase());
@@ -90,12 +95,13 @@
 
             var blogHandler = autofacServiceProvider.GetService<IQueryHandler<GetManyQuery<Blog>, ILimitedEnumerable<Blog>>>();
             var blogHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<GetManyQuery<Blog>, ILimitedEnumerable<Blog>>>();
-            var commentHandler = autofacServiceProvider.GetService<IQueryHandler<GetManyQuery<Comment>, ILimitedEnumerable<Comment>>>();
-            var commentHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<GetManyQuery<Comment>, ILimitedEnumerable<Comment>>>();
+
             Assert.NotNull(blogHandler);
             Assert.NotNull(blogHandlerAsync);
-            Assert.NotNull(commentHandler);
-            Assert.NotNull(commentHandlerAsync);
+            Assert.Equal(typeof(GetManyQueryHandler<Blog>), blogHandler.GetType());
+            Assert.Equal(typeof(GetManyQueryHandler<Blog>), blogHandlerAsync.GetType());
+            Assert.NotNull((blogHandler as GetManyQueryHandler<Blog>).DataSource);
+            Assert.NotNull((blogHandlerAsync as GetManyQueryHandler<Blog>).DataSource);
         }
 
         [Fact]
@@ -108,15 +114,17 @@
             var defaultServiceProvider = services.BuildServiceProvider();
             var autofacServiceProvider = defaultServiceProvider.GetService<AutofacServiceProvider>();
 
-            var blogHandler = autofacServiceProvider.GetService<IQueryHandler<ProjectManyQuery<Blog, Blog>, IEnumerable<Blog>>>();
-            var blogHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<ProjectManyQuery<Blog, Blog>, IEnumerable<Blog>>>();
-            var commentHandler = autofacServiceProvider.GetService<IQueryHandler<ProjectManyQuery<Comment, Comment>, IEnumerable<Comment>>>();
-            var commentHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<ProjectManyQuery<Comment, Comment>, IEnumerable<Comment>>>();
-
+            var blogHandler = autofacServiceProvider.GetService<IQueryHandler<ProjectManyQuery<Blog, BlogDto>, IEnumerable<BlogDto>>>();
+            var blogHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<ProjectManyQuery<Blog, BlogDto>, IEnumerable<BlogDto>>>();
+            
             Assert.NotNull(blogHandler);
             Assert.NotNull(blogHandlerAsync);
-            Assert.NotNull(commentHandler);
-            Assert.NotNull(commentHandlerAsync);
+            Assert.Equal(typeof(ProjectManyQueryHandler<Blog, BlogDto>), blogHandler.GetType());
+            Assert.Equal(typeof(ProjectManyQueryHandler<Blog, BlogDto>), blogHandlerAsync.GetType());
+            Assert.NotNull((blogHandler as ProjectManyQueryHandler<Blog, BlogDto>).DataSource);
+            Assert.NotNull((blogHandler as ProjectManyQueryHandler<Blog, BlogDto>).Projector);
+            Assert.NotNull((blogHandlerAsync as ProjectManyQueryHandler<Blog, BlogDto>).DataSource);
+            Assert.NotNull((blogHandlerAsync as ProjectManyQueryHandler<Blog, BlogDto>).Projector);
         }
 
         [Fact]
@@ -131,13 +139,13 @@
 
             var blogHandler = autofacServiceProvider.GetService<IQueryHandler<ExistsQuery<Blog>, bool>>();
             var blogHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<ExistsQuery<Blog>, bool>>();
-            var commentHandler = autofacServiceProvider.GetService<IQueryHandler<ExistsQuery<Comment>, bool>>();
-            var commentHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<ExistsQuery<Comment>, bool>>();
 
             Assert.NotNull(blogHandler);
             Assert.NotNull(blogHandlerAsync);
-            Assert.NotNull(commentHandler);
-            Assert.NotNull(commentHandlerAsync);
+            Assert.Equal(typeof(ExistsQueryHandler<Blog>), blogHandler.GetType());
+            Assert.Equal(typeof(ExistsQueryHandler<Blog>), blogHandlerAsync.GetType());
+            Assert.NotNull((blogHandler as ExistsQueryHandler<Blog>).DataSource);
+            Assert.NotNull((blogHandlerAsync as ExistsQueryHandler<Blog>).DataSource);
         }
 
         [Fact]
@@ -152,13 +160,13 @@
 
             var blogHandler = autofacServiceProvider.GetService<IQueryHandler<CountQuery<Blog>, long>>();
             var blogHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<CountQuery<Blog>, long>>();
-            var commentHandler = autofacServiceProvider.GetService<IQueryHandler<CountQuery<Comment>, long>>();
-            var commentHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<CountQuery<Comment>, long>>();
 
             Assert.NotNull(blogHandler);
             Assert.NotNull(blogHandlerAsync);
-            Assert.NotNull(commentHandler);
-            Assert.NotNull(commentHandlerAsync);
+            Assert.Equal(typeof(CountQueryHandler<Blog>), blogHandler.GetType());
+            Assert.Equal(typeof(CountQueryHandler<Blog>), blogHandlerAsync.GetType());
+            Assert.NotNull((blogHandler as CountQueryHandler<Blog>).DataSource);
+            Assert.NotNull((blogHandlerAsync as CountQueryHandler<Blog>).DataSource);
         }
 
         [Fact]
@@ -176,6 +184,10 @@
 
             Assert.NotNull(blogHandler);
             Assert.NotNull(blogHandlerAsync);
+            Assert.Equal(typeof(CreateCommandHandler<Blog>), blogHandler.GetType());
+            Assert.Equal(typeof(CreateCommandHandler<Blog>), blogHandlerAsync.GetType());
+            Assert.NotNull((blogHandler as CreateCommandHandler<Blog>).DataSource);
+            Assert.NotNull((blogHandlerAsync as CreateCommandHandler<Blog>).DataSource);
         }
 
         [Fact]
@@ -193,6 +205,10 @@
 
             Assert.NotNull(blogHandler);
             Assert.NotNull(blogHandlerAsync);
+            Assert.Equal(typeof(CreateManyCommandHandler<Blog>), blogHandler.GetType());
+            Assert.Equal(typeof(CreateManyCommandHandler<Blog>), blogHandlerAsync.GetType());
+            Assert.NotNull((blogHandler as CreateManyCommandHandler<Blog>).DataSource);
+            Assert.NotNull((blogHandlerAsync as CreateManyCommandHandler<Blog>).DataSource);
         }
 
         [Fact]
@@ -206,14 +222,22 @@
             var autofacServiceProvider = defaultServiceProvider.GetService<AutofacServiceProvider>();
 
             var blogHandler = autofacServiceProvider.GetService<ICommandHandler<UpdateCommand<Blog>, IUpdateResult>>();
-            var projectedBlogHandler = autofacServiceProvider.GetService<ICommandHandler<UpdateCommand<Blog, BlogDto>, IUpdateResult>>();
             var blogHandlerAsync = autofacServiceProvider.GetService<ICommandHandlerAsync<UpdateCommand<Blog>, IUpdateResult>>();
+            var projectedBlogHandler = autofacServiceProvider.GetService<ICommandHandler<UpdateCommand<Blog, BlogDto>, IUpdateResult>>();
             var projectedBlogHandlerAsync = autofacServiceProvider.GetService<ICommandHandlerAsync<UpdateCommand<Blog, BlogDto>, IUpdateResult>>();
 
             Assert.NotNull(blogHandler);
-            Assert.NotNull(projectedBlogHandler);
             Assert.NotNull(blogHandlerAsync);
+            Assert.NotNull(projectedBlogHandler);
             Assert.NotNull(projectedBlogHandlerAsync);
+            Assert.Equal(typeof(UpdateCommandHandler<Blog>), blogHandler.GetType());
+            Assert.Equal(typeof(UpdateCommandHandler<Blog>), blogHandlerAsync.GetType());
+            Assert.Equal(typeof(UpdateCommandHandler<Blog, BlogDto>), projectedBlogHandler.GetType());
+            Assert.Equal(typeof(UpdateCommandHandler<Blog, BlogDto>), projectedBlogHandlerAsync.GetType());
+            Assert.NotNull((blogHandler as UpdateCommandHandler<Blog>).DataSource);
+            Assert.NotNull((blogHandlerAsync as UpdateCommandHandler<Blog>).DataSource);
+            Assert.NotNull((projectedBlogHandler as UpdateCommandHandler<Blog, BlogDto>).DataSource);
+            Assert.NotNull((projectedBlogHandlerAsync as UpdateCommandHandler<Blog, BlogDto>).DataSource);
         }
 
         [Fact]
@@ -231,6 +255,10 @@
            
             Assert.NotNull(blogHandler);
             Assert.NotNull(blogHandlerAsync);
+            Assert.Equal(typeof(DeleteCommandHandler<Blog>), blogHandler.GetType());
+            Assert.Equal(typeof(DeleteCommandHandler<Blog>), blogHandlerAsync.GetType());
+            Assert.NotNull((blogHandler as DeleteCommandHandler<Blog>).DataSource);
+            Assert.NotNull((blogHandlerAsync as DeleteCommandHandler<Blog>).DataSource);
         }
     }
 }
