@@ -8,7 +8,12 @@
     using System.Threading.Tasks;
     #endregion
 
-    public class EfDataSourceBased : IQueryableDataSource, IModifiableDataSource, IAsyncModifiableDataSource
+    public class EfDataSourceBased
+        : IQueryableDataSource
+        , IModifiableDataSource
+        , IPartiallyModifiableDataSource
+        , IModifiableDataSourceAsync
+        , IPartiallyModifiableDataSourceAsync
     {
         internal readonly DbContext _dbContext;
 
@@ -33,47 +38,13 @@
 
         public bool UpdateFirst<T>(ISpecification<T> applyTo, T value) where T : class
         {
-            bool isUpdated = false;
-            var entityToUpdate = Query<T>().MaybeWhere(applyTo).FirstOrDefault();
-            if(entityToUpdate != null)
-            {
-                SetValues(entityToUpdate, value);
-                isUpdated = true;
-                _dbContext.SaveChanges();
-            }
-
-            return isUpdated;
+            return this.UpdateFirst<T>(applyTo, assignableValue: value);
         }
 
         public int UpdateRange<T>(ISpecification<T> applyTo, T value) where T : class
         {
-            int updatedCount = 0;
-            var entitiesToUpdate = Query<T>().MaybeWhere(applyTo).ToList();
-            if(entitiesToUpdate != null && entitiesToUpdate.Any())
-            {
-                foreach (var entity in entitiesToUpdate)
-                {
-                    SetValues(entity, value);
-                    updatedCount++;
-                }
-
-                _dbContext.SaveChanges();
-            }
-
-            return updatedCount;
-        }
-
-        private void SetValues<T>(T from, T to) where T : class
-        {
-            var entityType = from.GetType();
-            var entry = _dbContext.Entry(from);
-            var propertiesToSet = _dbContext.Model.FindEntityType(entityType)
-                .GetProperties()
-                .Where(p => !p.IsPrimaryKey())
-                .ToDictionary(p => p.Name, p => entityType.GetProperty(p.Name).GetValue(to));
-
-            entry.CurrentValues.SetValues(values: propertiesToSet);
-        }
+            return this.UpdateRange<T>(applyTo, assignableValue: value);
+        }    
 
         public bool DeleteFirst<T>(ISpecification<T> applyTo) where T : class
         {
@@ -109,6 +80,55 @@
 
         #endregion
 
+        #region IPartiallyModifiableDataSource members
+
+        private void SetValues<T>(object from, T to)
+            where T : class
+        {
+            var destType = from.GetType();
+            var sourceType = to.GetType();
+            var entry = _dbContext.Entry(from);
+            var propertiesToSet = _dbContext.Model.FindEntityType(destType)
+                .GetProperties()
+                .Where(p => !p.IsPrimaryKey())
+                .ToDictionary(p => p.Name, p => sourceType.GetProperty(p.Name).GetValue(to));
+
+            entry.CurrentValues.SetValues(values: propertiesToSet);
+        }
+
+        public bool UpdateFirst<T>(ISpecification<T> applyTo, object assignableValue) where T : class
+        {
+            bool isUpdated = false;
+            var entityToUpdate = Query<T>().MaybeWhere(applyTo).FirstOrDefault();
+            if (entityToUpdate != null)
+            {
+                SetValues(entityToUpdate, assignableValue);
+                isUpdated = true;
+                _dbContext.SaveChanges();
+            }
+
+            return isUpdated;
+        }
+        public int UpdateRange<T>(ISpecification<T> applyTo, object assignableValue) where T : class
+        {
+            int updatedCount = 0;
+            var entitiesToUpdate = Query<T>().MaybeWhere(applyTo).ToList();
+            if (entitiesToUpdate != null && entitiesToUpdate.Any())
+            {
+                foreach (var entity in entitiesToUpdate)
+                {
+                    SetValues(entity, assignableValue);
+                    updatedCount++;
+                }
+
+                _dbContext.SaveChanges();
+            }
+
+            return updatedCount;
+        }
+
+        #endregion
+
         #region IAsyncModifiableDataSource members
 
         public async Task<T> CreateAsync<T>(T value) where T : class
@@ -120,34 +140,12 @@
 
         public async Task<bool> UpdateFirstAsync<T>(ISpecification<T> applyTo, T value) where T : class
         {
-            bool isUpdated = false;
-            var entityToUpdate = await Query<T>().MaybeWhere(applyTo).FirstOrDefaultAsync();
-            if (entityToUpdate != null)
-            {
-                SetValues(entityToUpdate, value);
-                isUpdated = true;
-                await _dbContext.SaveChangesAsync();
-            }
-
-            return isUpdated;
+            return await this.UpdateFirstAsync<T>(applyTo, assignableValue: value);
         }
 
         public async Task<int> UpdateRangeAsync<T>(ISpecification<T> applyTo, T value) where T : class
         {
-            int updatedCount = 0;
-            var entitiesToUpdate = await Query<T>().MaybeWhere(applyTo).ToListAsync();
-            if (entitiesToUpdate != null && entitiesToUpdate.Any())
-            {
-                foreach (var entity in entitiesToUpdate)
-                {
-                    SetValues(entity, value);
-                    updatedCount++;
-                }
-
-                await _dbContext.SaveChangesAsync();
-            }
-
-            return updatedCount;
+            return await this.UpdateRangeAsync<T>(applyTo, assignableValue: value);
         }
 
         public async Task<bool> DeleteFirstAsync<T>(ISpecification<T> applyTo) where T : class
@@ -180,6 +178,42 @@
             }
 
             return deletedCount;
+        }
+
+        #endregion
+
+        #region IPartiallyModifiableDataSourceAsync members
+
+        public async Task<bool> UpdateFirstAsync<T>(ISpecification<T> applyTo, object assignableValue) where T : class
+        {
+            bool isUpdated = false;
+            var entityToUpdate = await Query<T>().MaybeWhere(applyTo).FirstOrDefaultAsync();
+            if (entityToUpdate != null)
+            {
+                SetValues(entityToUpdate, assignableValue);
+                isUpdated = true;
+                await _dbContext.SaveChangesAsync();
+            }
+
+            return isUpdated;
+        }
+
+        public async Task<int> UpdateRangeAsync<T>(ISpecification<T> applyTo, object assignableValue) where T : class
+        {
+            int updatedCount = 0;
+            var entitiesToUpdate = await Query<T>().MaybeWhere(applyTo).ToListAsync();
+            if (entitiesToUpdate != null && entitiesToUpdate.Any())
+            {
+                foreach (var entity in entitiesToUpdate)
+                {
+                    SetValues(entity, assignableValue);
+                    updatedCount++;
+                }
+
+                await _dbContext.SaveChangesAsync();
+            }
+
+            return updatedCount;
         }
 
         #endregion
