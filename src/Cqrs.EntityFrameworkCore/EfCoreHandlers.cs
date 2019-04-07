@@ -59,6 +59,12 @@
                 .WithParameter((param, ctx) => param.Name == "dataSourceFactory", (param, ctx) => ctx.Resolve<DataSourceFactory>())
                 .InstancePerLifetimeScope();
 
+            builder.RegisterGeneric(typeof(CreateManyCommandHandler<>))
+                .AsImplementedInterfaces()
+                .UsingConstructor(typeof(DataSourceFactory))
+                .WithParameter((param, ctx) => param.Name == "dataSourceFactory", (param, ctx) => ctx.Resolve<DataSourceFactory>())
+                .InstancePerLifetimeScope();
+
             builder.RegisterGeneric(typeof(UpdateCommandHandler<>))
                 .AsImplementedInterfaces()
                 .UsingConstructor(typeof(DataSourceFactory))

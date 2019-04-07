@@ -179,6 +179,23 @@
         }
 
         [Fact]
+        public void RegistersCreateManyCommandHandler()
+        {
+            var services = new ServiceCollection();
+            services.AddDbContext<BloggingContext>(o => o.UseInMemoryDatabase());
+
+            services.UseCqrsEntityFramework<BloggingContext>();
+            var defaultServiceProvider = services.BuildServiceProvider();
+            var autofacServiceProvider = defaultServiceProvider.GetService<AutofacServiceProvider>();
+
+            var blogHandler = autofacServiceProvider.GetService<ICommandHandler<CreateManyCommand<Blog>>>();
+            var blogHandlerAsync = autofacServiceProvider.GetService<ICommandHandlerAsync<CreateManyCommand<Blog>>>();
+
+            Assert.NotNull(blogHandler);
+            Assert.NotNull(blogHandlerAsync);
+        }
+
+        [Fact]
         public void RegistersUpdateCommandHandler()
         {
             var services = new ServiceCollection();
