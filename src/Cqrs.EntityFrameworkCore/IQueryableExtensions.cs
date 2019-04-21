@@ -2,6 +2,7 @@
 {
     #region Using
     using Cqrs.Common.Queries;
+    using Cqrs.Common.Queries.FetchStateries;
     using Cqrs.Common.Queries.Pagination;
     using Cqrs.Common.Queries.Sorting;
     using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@
     {
         internal static IQueryable<T> ApplyFetchStrategy<T>(this IQueryable<T> source, IFetchStrategy<T> fetchStrategy)
         {
-            if (fetchStrategy != null)
+            if (fetchStrategy != null && !(fetchStrategy is FetchAllStatery<T>))
             {
                 return source.SelectOnly<T>(fetchStrategy.FetchedPaths);
             }
@@ -28,7 +29,7 @@
         internal static IQueryable<T> ApplyFetchStrategy<T>(this IQueryable<T> source, IFetchStrategy<T> fetchStrategy, DbContext dbContext)
             where T : class
         {
-            if (fetchStrategy != null)
+            if (fetchStrategy != null && !(fetchStrategy is FetchAllStatery<T>))
             {
                 var entityType = dbContext.Model.FindEntityType(typeof(T));
                 if(entityType != null)
@@ -56,14 +57,14 @@
 
         private static Func<T, T> BuildSelector<T>(IEnumerable<string> paths)
         {
+            var type = typeof(T);
             var lamdaParameter = Expression.Parameter(typeof(T), "x");
-            var xNew = Expression.New(typeof(T));
-            var bindings = paths.Select(o =>
+            var xNew = Expression.New(type);
+            var bindings = paths.Select(path => type.GetProperty(path)).Where(prop => prop.SetMethod != null).Select(prop =>
             {
-                var pathProperty = typeof(T).GetProperty(o);
-                var getPropertyExpression = Expression.Property(lamdaParameter, pathProperty);
+                var getPropertyExpression = Expression.Property(lamdaParameter, prop);
                 // set value "Field1 = x.Field1"
-                return Expression.Bind(pathProperty, getPropertyExpression);
+                return Expression.Bind(prop, getPropertyExpression);
             });
 
             var xInit = Expression.MemberInit(xNew, bindings);
