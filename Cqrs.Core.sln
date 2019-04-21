@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2047
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28714.193
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cqrs.Core", "src\Cqrs.Core\Cqrs.Core.csproj", "{DF5178C6-4C21-460A-9601-0021C7096561}"
 EndProject
@@ -19,7 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cqrs.JsonApi", "src\Cqrs.Js
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{27C37236-C4C5-47E6-98CE-5DC62B9BDE73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cqrs.Tests", "tests\Cqrs.Tests\Cqrs.Tests.csproj", "{0AD52954-60BA-4332-BE30-C9F426674CEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cqrs.Tests", "tests\Cqrs.Tests\Cqrs.Tests.csproj", "{0AD52954-60BA-4332-BE30-C9F426674CEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cqrs.Web.JsonApi", "src\Cqrs.Web.JsonApi\Cqrs.Web.JsonApi.csproj", "{E66E506B-18FF-4DAE-B23D-81FF8AEDB556}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +57,10 @@ Global
 		{0AD52954-60BA-4332-BE30-C9F426674CEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0AD52954-60BA-4332-BE30-C9F426674CEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0AD52954-60BA-4332-BE30-C9F426674CEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E66E506B-18FF-4DAE-B23D-81FF8AEDB556}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E66E506B-18FF-4DAE-B23D-81FF8AEDB556}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E66E506B-18FF-4DAE-B23D-81FF8AEDB556}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E66E506B-18FF-4DAE-B23D-81FF8AEDB556}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,6 +73,7 @@ Global
 		{236E198A-54BF-4F5D-BBB4-4D53B3AB4DE0} = {F7173622-79AE-48B5-B72A-0F4D75CEC911}
 		{B2162676-A6AD-45A2-8CDD-E83ED5FE0BF0} = {F7173622-79AE-48B5-B72A-0F4D75CEC911}
 		{0AD52954-60BA-4332-BE30-C9F426674CEB} = {27C37236-C4C5-47E6-98CE-5DC62B9BDE73}
+		{E66E506B-18FF-4DAE-B23D-81FF8AEDB556} = {F7173622-79AE-48B5-B72A-0F4D75CEC911}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D70F7910-4424-46BE-B6AF-7CD2E81E611F}
