@@ -11,10 +11,6 @@
     {
         #region Project all use cases
 
-        public ProjectManyQuery()
-        {
-        }
-
         public ProjectManyQuery(params OrderCreteria<TDest>[] sortingParams) : base(sortingParams)
         {
         }

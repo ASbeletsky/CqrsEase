@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Cqrs.Common.Queries;
 using Cqrs.Common.Queries.FetchStateries;
+using Cqrs.Common.Queries.Sorting;
 using Cqrs.EntityFrameworkCore;
 using Cqrs.EntityFrameworkCore.DataSource;
 using Cqrs.EntityFrameworkCore.QueryHandlers;
@@ -51,7 +52,7 @@ namespace Cqrs.Tests.EFCore
                 context.SaveChanges();
 
                 var expectedBlogId = "1";
-                var query = new ProjectFirstQuery<Blog, BlogDto>(b => b.Id);
+                var query = new ProjectFirstQuery<Blog, BlogDto>(sortingParams: new OrderCreteria<BlogDto>(b => b.Id));
                 var queryHandler = new ProjectFirstQueryHandler<Blog, BlogDto>(new EfDataSourceBased(context), projector);
                 var blogDto = queryHandler.Request(query);
 
@@ -157,7 +158,7 @@ namespace Cqrs.Tests.EFCore
                 context.SaveChanges();
 
                 var includeIdAndComments = new FetchOnlyStratery<BlogDto>(b => b.Id, b => b.Comments);
-                var getFirstBlogQuery = new ProjectFirstQuery<Blog, BlogDto>(includeIdAndComments, orderBy: b => b.Id);
+                var getFirstBlogQuery = new ProjectFirstQuery<Blog, BlogDto>(includeIdAndComments, sortingParams: new OrderCreteria<BlogDto>(b => b.Id));
                 var queryHandler = new ProjectFirstQueryHandler<Blog, BlogDto>(new EfDataSourceBased(context), projector);
                 var loadedBlog = queryHandler.Request(getFirstBlogQuery);
 

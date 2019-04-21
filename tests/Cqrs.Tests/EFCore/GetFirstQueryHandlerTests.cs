@@ -3,6 +3,7 @@
     #region Using
     using Cqrs.Common.Queries;
     using Cqrs.Common.Queries.FetchStateries;
+    using Cqrs.Common.Queries.Sorting;
     using Cqrs.EntityFrameworkCore.DataSource;
     using Cqrs.EntityFrameworkCore.QueryHandlers;
     using Cqrs.Tests.Model;
@@ -47,7 +48,7 @@
 
                 var expectedBlogId = 1;
                 var spec = new Spec<Blog>(b => b.Title == "same blog title");
-                var query = new GetFirstQuery<Blog>(spec, orderBy: nameof(Blog.Id));
+                var query = new GetFirstQuery<Blog>(spec, sortingParams: new OrderCreteria<Blog>(nameof(Blog.Id), OrderDirection.ASC));
                 var queryHandler = new GetFirstQueryHandler<Blog>(new EfDataSourceBased(context));
                 var blog = queryHandler.Request(query);
 
@@ -68,7 +69,7 @@
 
                 var expectedBlogId = 1;
                 var spec = new Spec<Blog>(b => b.Title == "same blog title");
-                var query = new GetFirstQuery<Blog>(spec, orderBy: x => x.Id);
+                var query = new GetFirstQuery<Blog>(spec, sortingParams: new OrderCreteria<Blog>(x => x.Id));
                 var queryHandler = new GetFirstQueryHandler<Blog>(new EfDataSourceBased(context));
                 var blog = queryHandler.Request(query);
 
@@ -140,7 +141,7 @@
                 context.Comments.AddRange(blogComments);
                 context.SaveChanges();
 
-                var getFirstBlogQuery = new GetFirstQuery<Blog>(orderBy: b => b.Id);
+                var getFirstBlogQuery = new GetFirstQuery<Blog>(sortingParams: new OrderCreteria<Blog>(b => b.Id));
                 var queryHandler = new GetFirstQueryHandler<Blog>(new EfDataSourceBased(context));
                 var loadedBlog = queryHandler.Request(getFirstBlogQuery);
                     
@@ -170,7 +171,7 @@
                 context.SaveChanges();
 
                 var includeIdAndComments = new FetchOnlyStratery<Blog>(b => b.Id, b => b.Comments);
-                var getFirstBlogQuery = new GetFirstQuery<Blog>(includeIdAndComments, orderBy: b => b.Id);
+                var getFirstBlogQuery = new GetFirstQuery<Blog>(includeIdAndComments, sortingParams: new OrderCreteria<Blog>(b => b.Id));
                 var queryHandler = new GetFirstQueryHandler<Blog>(new EfDataSourceBased(context));
                 var loadedBlog = queryHandler.Request(getFirstBlogQuery);
 
