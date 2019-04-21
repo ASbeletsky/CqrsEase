@@ -7,13 +7,13 @@
 
     public class OrderCreteria<T>
     {
-        public OrderCreteria(string sortKey, OrderDirection direction)
+        public OrderCreteria(string sortKey, OrderDirection direction = OrderDirection.ASC)
         {
             SortKey = sortKey;
             Direction = direction;
         }
 
-        public OrderCreteria(Expression<Func<T, object>> sortKeySelector, OrderDirection direction)
+        public OrderCreteria(Expression<Func<T, object>> sortKeySelector, OrderDirection direction = OrderDirection.ASC)
             : this(sortKeySelector.ToPropertyName(), direction)
         {
         }
