@@ -2,7 +2,7 @@
 {
     #region Using
     using Cqrs.Common.Queries;
-    using Cqrs.Common.Queries.FetchStateries;
+    using Cqrs.Common.Queries.FetchStrategies;
     using Cqrs.Core.Abstractions;
     using Cqrs.EntityFrameworkCore.DataSource;
     using Microsoft.EntityFrameworkCore;

@@ -2,7 +2,7 @@
 {
     #region Using
     using Cqrs.Common.Queries;
-    using Cqrs.Common.Queries.FetchStateries;
+    using Cqrs.Common.Queries.FetchStrategies;
     using Cqrs.Common.Queries.Pagination;
     using Cqrs.Common.Queries.Sorting;
     using Cqrs.Core.Abstractions;
@@ -110,7 +110,7 @@
                 context.Blogs.AddRange(firstBlog, secondBlog, thirdBlog);
                 context.SaveChanges();
 
-                var includeOnlyId = new FetchOnlyStratery<Blog>((b => b.Id));
+                var includeOnlyId = new FetchOnlyStrategy<Blog>((b => b.Id));
                 var query = new GetManyQuery<Blog>(includeOnlyId);
                 var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context));
                 var blogs = queryHandler.Request(query);
@@ -187,7 +187,7 @@
                 context.Blogs.AddRange(firstBlog, secondBlog);
                 context.SaveChanges();
 
-                var includeIdAndComments = new FetchOnlyStratery<Blog>(b => b.Id, b => b.Comments);
+                var includeIdAndComments = new FetchOnlyStrategy<Blog>(b => b.Id, b => b.Comments);
                 var getAllBlogsQuery = new GetManyQuery<Blog>(includeIdAndComments);
                 var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context));
                 var blogs = queryHandler.Request(getAllBlogsQuery);

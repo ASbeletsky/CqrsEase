@@ -5,7 +5,7 @@
     using Cqrs.Common.Queries.Sorting;
     using System;
     using System.Linq.Expressions;
-    using Cqrs.Common.Queries.FetchStateries;
+    using Cqrs.Common.Queries.FetchStrategies;
     using System.Collections.Generic;
     #endregion
 

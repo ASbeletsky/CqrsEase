@@ -3,7 +3,7 @@
     #region Using
     using AutoMapper;
     using Cqrs.Common.Queries;
-    using Cqrs.Common.Queries.FetchStateries;
+    using Cqrs.Common.Queries.FetchStrategies;
     using Cqrs.Common.Queries.Pagination;
     using Cqrs.Common.Queries.Sorting;
     using Cqrs.Core.Abstractions;
@@ -116,7 +116,7 @@
                 context.Blogs.AddRange(firstBlog, secondBlog, thirdBlog);
                 context.SaveChanges();
 
-                var includeOnlyId = new FetchOnlyStratery<BlogDto>((b => b.Id));
+                var includeOnlyId = new FetchOnlyStrategy<BlogDto>((b => b.Id));
                 var query = new ProjectManyQuery<Blog, BlogDto>(includeOnlyId);
                 var queryHandler = new ProjectManyQueryHandler<Blog, BlogDto>(new EfDataSourceBased(context), projector);
                 var blogsDtos = queryHandler.Request(query);
@@ -195,7 +195,7 @@
                 context.Blogs.AddRange(firstBlog, secondBlog);
                 context.SaveChanges();
 
-                var includeIdAndComments = new FetchOnlyStratery<BlogDto>(b => b.Id, b => b.Comments);
+                var includeIdAndComments = new FetchOnlyStrategy<BlogDto>(b => b.Id, b => b.Comments);
                 var getAllBlogsQuery = new ProjectManyQuery<Blog, BlogDto>(includeIdAndComments);
                 var queryHandler = new ProjectManyQueryHandler<Blog, BlogDto>(new EfDataSourceBased(context), projector);
                 var blogsDtos = queryHandler.Request(getAllBlogsQuery);

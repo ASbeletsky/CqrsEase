@@ -2,7 +2,7 @@
 {
     #region Using
     using Cqrs.Common.Queries;
-    using Cqrs.Common.Queries.FetchStateries;
+    using Cqrs.Common.Queries.FetchStrategies;
     using Cqrs.Common.Queries.Sorting;
     using Cqrs.EntityFrameworkCore.DataSource;
     using Cqrs.EntityFrameworkCore.QueryHandlers;
@@ -110,7 +110,7 @@
                 context.Blogs.Add(expectedBlog);
                 context.SaveChanges();
 
-                var includeOnlyId = new FetchOnlyStratery<Blog>((b => b.Id));
+                var includeOnlyId = new FetchOnlyStrategy<Blog>((b => b.Id));
                 var query = new GetFirstQuery<Blog>(includeOnlyId);
                 var queryHandler = new GetFirstQueryHandler<Blog>(new EfDataSourceBased(context));
                 var actualBlog = queryHandler.Request(query);
@@ -170,7 +170,7 @@
                 context.Comments.AddRange(blogComments);
                 context.SaveChanges();
 
-                var includeIdAndComments = new FetchOnlyStratery<Blog>(b => b.Id, b => b.Comments);
+                var includeIdAndComments = new FetchOnlyStrategy<Blog>(b => b.Id, b => b.Comments);
                 var getFirstBlogQuery = new GetFirstQuery<Blog>(includeIdAndComments, sortingParams: new OrderCreteria<Blog>(b => b.Id));
                 var queryHandler = new GetFirstQueryHandler<Blog>(new EfDataSourceBased(context));
                 var loadedBlog = queryHandler.Request(getFirstBlogQuery);

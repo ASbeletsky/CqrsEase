@@ -1,10 +1,8 @@
-﻿namespace Cqrs.Common.Queries.FetchStateries
+﻿namespace Cqrs.Common.Queries.FetchStrategies
 {
-    using System.Collections.Generic;
-
-    public class FetchAllStatery<T> : FetchStrategy<T>
+    public class FetchAllStrategy<T> : FetchStrategy<T>
     {
-        public FetchAllStatery() : base(typeof(T).GetProperiesNames())
+        public FetchAllStrategy() : base(typeof(T).GetProperiesNames())
         {
         }
     }

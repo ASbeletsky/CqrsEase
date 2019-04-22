@@ -2,7 +2,7 @@
 {
     #region Using
     using Cqrs.Common.Queries;
-    using Cqrs.Common.Queries.FetchStateries;
+    using Cqrs.Common.Queries.FetchStrategies;
     using Cqrs.Common.Queries.Pagination;
     using Cqrs.Common.Queries.Sorting;
     using Microsoft.EntityFrameworkCore;
@@ -18,7 +18,7 @@
     {
         internal static IQueryable<T> ApplyFetchStrategy<T>(this IQueryable<T> source, IFetchStrategy<T> fetchStrategy)
         {
-            if (fetchStrategy != null && !(fetchStrategy is FetchAllStatery<T>))
+            if (fetchStrategy != null && !(fetchStrategy is FetchAllStrategy<T>))
             {
                 return source.SelectOnly<T>(fetchStrategy.FetchedPaths);
             }
@@ -29,7 +29,7 @@
         internal static IQueryable<T> ApplyFetchStrategy<T>(this IQueryable<T> source, IFetchStrategy<T> fetchStrategy, DbContext dbContext)
             where T : class
         {
-            if (fetchStrategy != null && !(fetchStrategy is FetchAllStatery<T>))
+            if (fetchStrategy != null && !(fetchStrategy is FetchAllStrategy<T>))
             {
                 var entityType = dbContext.Model.FindEntityType(typeof(T));
                 if(entityType != null)

@@ -2,6 +2,7 @@
 {
     #region Using
     using Cqrs.Common.Queries;
+    using Cqrs.Common.Queries.FetchStrategies;
     using Cqrs.Common.Queries.Pagination;
     using Cqrs.Core.Abstractions;
     using Cqrs.EntityFrameworkCore.DataSource;

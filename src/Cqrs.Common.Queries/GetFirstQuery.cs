@@ -1,7 +1,7 @@
 ﻿namespace Cqrs.Common.Queries
 {
     #region Using
-    using Cqrs.Common.Queries.FetchStateries;
+    using Cqrs.Common.Queries.FetchStrategies;
     using Cqrs.Common.Queries.Sorting;
     using Cqrs.Core.Abstractions;
     using NSpecifications;
@@ -22,7 +22,7 @@
         /// </summary>
         /// <param name="sortingParams">The ordering used to sort <typeparamref name="T"/> objects.</param> 
         public GetFirstQuery(params OrderCreteria<T>[] sortingParams)
-            : this(fetchStrategy: new FetchAllStatery<T>(), sortingParams: sortingParams)
+            : this(fetchStrategy: new FetchAllStrategy<T>(), sortingParams: sortingParams)
         {
         }
 
@@ -60,7 +60,7 @@
         /// <param name="specification">The creteria used to filter <typeparamref name="T"/> objects.</param>
         /// <param name="sortingParams">The ordering used to sort <typeparamref name="T"/> objects.</param>
         public GetFirstQuery(ISpecification<T> specification, params OrderCreteria<T>[] sortingParams)
-            : this(fetchStrategy: new FetchAllStatery<T>(), specification: specification, sortingParams: sortingParams)
+            : this(fetchStrategy: new FetchAllStrategy<T>(), specification: specification, sortingParams: sortingParams)
         {
         }
 

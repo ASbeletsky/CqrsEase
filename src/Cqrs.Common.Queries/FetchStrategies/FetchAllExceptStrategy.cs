@@ -1,4 +1,4 @@
-﻿namespace Cqrs.Common.Queries.FetchStateries
+﻿namespace Cqrs.Common.Queries.FetchStrategies
 {
     #region Using
     using System;
@@ -6,15 +6,15 @@
     using System.Linq.Expressions;
     #endregion
 
-    public class FetchAllExceptStatery<T> : FetchStrategy<T>
+    public class FetchAllExceptStrategy<T> : FetchStrategy<T>
     {
-        public FetchAllExceptStatery(params string[] excludedPaths)
+        public FetchAllExceptStrategy(params string[] excludedPaths)
             : base(typeof(T).GetProperiesNames().Except(excludedPaths))
         {
                 
         }
 
-        public FetchAllExceptStatery(params Expression<Func<T, object>>[] excludedPaths)
+        public FetchAllExceptStrategy(params Expression<Func<T, object>>[] excludedPaths)
             : this(excludedPaths.Select(e => e.ToPropertyName()).ToArray())
         {
                 
