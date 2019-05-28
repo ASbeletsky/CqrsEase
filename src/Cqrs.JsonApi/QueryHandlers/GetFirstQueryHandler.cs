@@ -1,16 +1,20 @@
-﻿using Cqrs.Common.Queries;
-using Cqrs.Core.Abstractions;
-using RestEase;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Cqrs.JsonApi.QueryHandlers
+﻿namespace Cqrs.JsonApi.QueryHandlers
 {
-    internal class GetFirstQueryHandler<TResource>
+    #region Using
+    using Cqrs.Common.Queries;
+    using Cqrs.Common.Queries.Pagination;
+    using Cqrs.Core.Abstractions;
+    using Cqrs.JsonApi.Web;
+    using Cqrs.JsonApi.Web.Request;
+    using Microsoft.AspNetCore.Http.Extensions;
+    using RestEase;
+    using System.Linq;
+    using System.Threading.Tasks;
+    #endregion
+
+    public class GetFirstQueryHandler<TResource>
         : IQueryHandlerAsync<GetFirstQuery<TResource>, TResource>
-        where TResource : IResource
+        where TResource : IResource, new()
     {
         public GetFirstQueryHandler(string baseUrl)
         {
@@ -19,9 +23,19 @@ namespace Cqrs.JsonApi.QueryHandlers
 
         public JsonApiBased<TResource> RestClient { get; private set; }
 
-        public Task<TResource> RequestAsync(GetFirstQuery<TResource> query)
+        public async Task<TResource> RequestAsync(GetFirstQuery<TResource> query)
         {
-            throw new NotImplementedException();
+            var takeOnePaging = new Page(pageNumber: 1, pageSize: 1);
+            var queryString = new QueryBuilder()
+                .AddIncludedResources(query.FetchStrategy)
+                .AddSparseFieldsets(query.FetchStrategy)
+                .AddFilter(query.Specification)
+                .AddPaging(takeOnePaging)
+                .AddSorting(query.Sorting)
+                .ToQueryString();
+
+            var result = await RestClient.Get(queryString.Value);
+            return result.FirstOrDefault();
         }
     }
 
