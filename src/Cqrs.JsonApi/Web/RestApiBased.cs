@@ -1,24 +1,12 @@
-﻿using Newtonsoft.Json;
-using RestEase;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace Cqrs.JsonApi
+﻿namespace Cqrs.JsonApi.Web
 {
-    public interface IRestApiBased<T, TKey>
-    {
-        Task<T> Post(T paylod);
+    #region Using
+    using Newtonsoft.Json;
+    using RestEase;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
 
-        Task<T> Get(TKey id);
-
-        Task<IEnumerable<T>> Get(string queryString);
-
-        Task PUT(TKey id, T payload);
-
-        Task Patch(TKey id, T payload);
-
-        Task Delete(TKey key);
-    }
+    #endregion
 
     public abstract class RestApiBased<T, TKey> : IRestApiBased<T, TKey>
     {

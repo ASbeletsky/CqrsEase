@@ -1,9 +1,7 @@
-﻿using JsonApiSerializer;
-using RestEase;
-using System.Threading.Tasks;
-
-namespace Cqrs.JsonApi
+﻿namespace Cqrs.JsonApi.Web
 {
+    using JsonApiSerializer;
+
     public abstract class JsonApiBased<TResource> : RestApiBased<TResource, string>
         where TResource : IResource
     {
