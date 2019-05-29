@@ -1,5 +1,6 @@
 ﻿namespace Cqrs.JsonApi.Web.Request
 {
+    using Cqrs.Common;
     #region Using
     using Cqrs.Common.Queries;
     using Cqrs.Common.Queries.Sorting;
@@ -21,8 +22,7 @@
 
             if (relatedResourcesProperies != null && relatedResourcesProperies.Any())
             {
-
-                var relatedResourcesToInlude = fetchStrategy.FetchedPaths.Where(path => relatedResourcesProperies.Any(prop => path.Contains(prop.Name)));
+                var relatedResourcesToInlude = fetchStrategy.FetchedPaths.Where(path => relatedResourcesProperies.Any(prop => path.Contains(prop.Name))).Select(f => f.ToCamelCase());
                 var includedResourcesString = string.Join(",", relatedResourcesToInlude);
                 return includedResourcesString;
             }
@@ -35,7 +35,7 @@
             var result = new Dictionary<string, string>();
             var resourceType = Activator.CreateInstance<TResource>();
             var relatedResourceSparseFields = fetchStrategy.FetchedPaths.Where(path => path.Contains("."));
-            var rootResourceSparseFields = fetchStrategy.FetchedPaths.Except(relatedResourceSparseFields);
+            var rootResourceSparseFields = fetchStrategy.FetchedPaths.Except(relatedResourceSparseFields).Select(f => f.ToCamelCase());
 
             string rootResourceSparseFieldsString = string.Join(",", rootResourceSparseFields);
             result.Add(resourceType.Type, rootResourceSparseFieldsString);
@@ -50,7 +50,8 @@
 
         internal static string ToJsonApiParameter<TResource>(this OrderCreteria<TResource> orderCreteria) where TResource : IResource
         {
-            return $"{orderCreteria.Direction}{orderCreteria.SortKey}";
+            string direction = orderCreteria.Direction == OrderDirection.DESC ? "-" : string.Empty;
+            return $"{direction}{orderCreteria.SortKey.ToCamelCase()}";
         }
 
         #region Filtering
@@ -71,7 +72,7 @@
                 MemberExpression proteprtySelector = (MemberExpression)eq.Left;
                 string propertyName = proteprtySelector.Member.Name;
                 object value = Evaluate(eq.Right);
-                result.Add(propertyName, value.ToString());
+                result.Add(propertyName.ToCamelCase(), value.ToString().ToCamelCase());
             }
             else if (expression is BinaryExpression binaryExpression)
             {

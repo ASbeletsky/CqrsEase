@@ -7,7 +7,6 @@
     using Cqrs.JsonApi.Web;
     using Cqrs.JsonApi.Web.Request;
     using Microsoft.AspNetCore.Http.Extensions;
-    using RestEase;
     using System.Linq;
     using System.Threading.Tasks;
     #endregion
@@ -23,18 +22,24 @@
 
         public IJsonApiEndpoint<TResource> ResourceEndpoint { get; private set; }
 
-        public async Task<TResource> RequestAsync(GetFirstQuery<TResource> query)
+        protected string BuildQueryString(GetFirstQuery<TResource> query)
         {
             var takeOnePaging = new Page(pageNumber: 1, pageSize: 1);
             var queryString = new QueryBuilder()
-                .AddIncludedResources(query.FetchStrategy)
-                .AddSparseFieldsets(query.FetchStrategy)
-                .AddFilter(query.Specification)
-                .AddPaging(takeOnePaging)
-                .AddSorting(query.Sorting)
+                .MaybeAddIncludedResources(query.FetchStrategy)
+                .MaybeAddSparseFieldsets(query.FetchStrategy)
+                .MaybeAddFilter(query.Specification)
+                .MaybeAddPaging(takeOnePaging)
+                .MaybeAddSorting(query.Sorting)
                 .ToQueryString();
 
-            var result = await RestClient.Get(queryString.Value);
+            return queryString.Value;
+        }
+
+        public async Task<TResource> RequestAsync(GetFirstQuery<TResource> query)
+        {
+            var queryString = BuildQueryString(query);
+            var result = await ResourceEndpoint.Get(queryString);
             return result.FirstOrDefault();
         }
     }
