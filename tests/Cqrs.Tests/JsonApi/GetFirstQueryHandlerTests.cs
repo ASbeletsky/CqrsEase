@@ -102,5 +102,24 @@
             Assert.Contains(queryParameters, p => p.Key == "fields[blog]");
             Assert.Equal("id,author", queryParameters["fields[blog]"]);
         }
+
+        [Fact]
+        public void RequestOnlyOneResource()
+        {
+            var query = new GetFirstQuery<BlogDto>();
+
+            var handler = new GetFirstQueryHandler<BlogDto>("http://test.com/blogs");
+            var buildQueryStringMethod = handler.GetType().GetTypeInfo().GetMethod("BuildQueryString", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            var encodedQueryString = (string)buildQueryStringMethod.Invoke(handler, new object[] { query });
+            var actualQueryString = WebUtility.UrlDecode(encodedQueryString);
+            var queryParameters = QueryHelpers.ParseQuery(actualQueryString);
+
+            Assert.NotNull(actualQueryString);
+            Assert.Contains(queryParameters, p => p.Key == "page[number]");
+            Assert.Equal("1", queryParameters["page[number]"]);
+            Assert.Contains(queryParameters, p => p.Key == "page[size]");
+            Assert.Equal("1", queryParameters["page[size]"]);
+        }
     }
 }
