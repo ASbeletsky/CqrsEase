@@ -13,7 +13,7 @@
 
     public class GetFirstQueryHandler<TResource>
         : IQueryHandlerAsync<GetFirstQuery<TResource>, TResource>
-        where TResource : IResource, new()
+        where TResource : class, IResource, new()
     {
         public GetFirstQueryHandler(string baseUrl)
         {
@@ -39,8 +39,8 @@
         public async Task<TResource> RequestAsync(GetFirstQuery<TResource> query)
         {
             var queryString = BuildQueryString(query);
-            var result = await ResourceEndpoint.Get(queryString);
-            return result.FirstOrDefault();
+            var responce = await ResourceEndpoint.Get(queryString);
+            return responce?.Data?.FirstOrDefault();
         }
     }
 

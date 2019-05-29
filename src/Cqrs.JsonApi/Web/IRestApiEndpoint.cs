@@ -8,14 +8,11 @@
 
     public interface IRestApiEndpoint<T, TKey>
     {
-        [Post()]
-        Task<T> Post([Body] T paylod);
-
-        [Get("{id}")]
-        Task<T> Get([Path] TKey id);
-
         [Get()]
         Task<IEnumerable<T>> Get([RawQueryString] string queryString);
+
+        [Post()]
+        Task<T> Post([Body] T paylod);
 
         [Put("{id}")]
         Task Put([Path]TKey id, [Body] T payload);

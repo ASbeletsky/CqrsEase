@@ -2,7 +2,6 @@
 {
     #region 
     using Cqrs.Common.Queries;
-    using Cqrs.Common.Queries.Pagination;
     using Cqrs.Core.Abstractions;
     using Cqrs.JsonApi.Web;
     using Cqrs.JsonApi.Web.Request;
@@ -38,7 +37,8 @@
         public async Task<IEnumerable<TResource>> RequestAsync(GetManyQuery<TResource> query)
         {
             var queryString = BuildQueryString(query);
-            return await ResourceEndpoint.Get(queryString);
+            var responce = await ResourceEndpoint.Get(queryString);
+            return responce?.Data;
         }
     }
 }
