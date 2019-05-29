@@ -1,12 +1,13 @@
 ﻿namespace Cqrs.JsonApi.Web
 {
     using JsonApiSerializer;
+    using RestEase;
 
-    public abstract class JsonApiBased<TResource> : RestApiBased<TResource, string>
-        where TResource : IResource
+    public class JsonApiClient : RestClient
     {
-        protected JsonApiBased(string baseUrl) : base(baseUrl, new JsonApiSerializerSettings())
+        public JsonApiClient(string baseUrl) : base(baseUrl)
         {
+            this.JsonSerializerSettings = new JsonApiSerializerSettings();
         }
     }
 }

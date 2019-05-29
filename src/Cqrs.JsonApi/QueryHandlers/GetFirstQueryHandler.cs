@@ -18,10 +18,10 @@
     {
         public GetFirstQueryHandler(string baseUrl)
         {
-            RestClient = new RestClient(baseUrl).For<JsonApiBased<TResource>>();
+            ResourceEndpoint = new JsonApiClient(baseUrl).For<IJsonApiEndpoint<TResource>>();
         }
 
-        public JsonApiBased<TResource> RestClient { get; private set; }
+        public IJsonApiEndpoint<TResource> ResourceEndpoint { get; private set; }
 
         public async Task<TResource> RequestAsync(GetFirstQuery<TResource> query)
         {
