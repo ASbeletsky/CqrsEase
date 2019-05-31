@@ -3,7 +3,7 @@ using Cqrs.Core.Abstractions;
 using Cqrs.JsonApi.Web;
 using System.Threading.Tasks;
 
-namespace Cqrs.JsonApi.QueryHandlers
+namespace Cqrs.JsonApi.CommandHandlers
 {
     public class CreateCommandHandler<TResource>
         : ICommandHandlerAsync<CreateCommand<TResource>, ICreateResult<TResource>>
