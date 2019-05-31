@@ -22,7 +22,7 @@
         /// </summary>
         /// <param name="sortingParams">The ordering used to sort <typeparamref name="T"/> objects.</param> 
         public GetFirstQuery(params OrderCreteria<T>[] sortingParams)
-            : this(fetchStrategy: new FetchAllStrategy<T>(), sortingParams: sortingParams)
+            : this(fetchStrategy: null, sortingParams: sortingParams)
         {
         }
 
@@ -60,7 +60,7 @@
         /// <param name="specification">The creteria used to filter <typeparamref name="T"/> objects.</param>
         /// <param name="sortingParams">The ordering used to sort <typeparamref name="T"/> objects.</param>
         public GetFirstQuery(ISpecification<T> specification, params OrderCreteria<T>[] sortingParams)
-            : this(fetchStrategy: new FetchAllStrategy<T>(), specification: specification, sortingParams: sortingParams)
+            : this(fetchStrategy: null, specification: specification, sortingParams: sortingParams)
         {
         }
 

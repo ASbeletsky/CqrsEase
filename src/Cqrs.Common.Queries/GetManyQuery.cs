@@ -24,7 +24,7 @@
         /// </summary>
         /// <param name="sortingParams">The ordering used to sort <typeparamref name="T"/> objects.</param>
         public GetManyQuery(params OrderCreteria<T>[] sortingParams)
-            : this(fetchStrategy: new FetchAllStrategy<T>(), sortingParams: sortingParams)
+            : this(fetchStrategy: null, sortingParams: sortingParams)
         {
         }
 
@@ -74,7 +74,7 @@
         /// <param name="pagination">The creteria used to limit rertived collection of <typeparamref name="T"/> objects to a subset.</param>
         /// <param name="sortingParams">The creterias used to sort collection of <typeparamref name="T"/> objects.</param>
         public GetManyQuery(ISpecification<T> specification, IPage pagination, params OrderCreteria<T>[] sortingParams)
-            : this(fetchStrategy: new FetchAllStrategy<T>(), specification: specification, pagination: pagination, sorting: sortingParams)
+            : this(fetchStrategy: null, specification: specification, pagination: pagination, sorting: sortingParams)
 
         {
         }
@@ -114,7 +114,7 @@
         /// <param name="pagination">The creteria used to limit rertived collection of <typeparamref name="T"/> objects to a subset.</param>
         /// <param name="sortingParams">The creterias used to sort collection of <typeparamref name="T"/> objects.</param>
         public GetManyQuery(IPage pagination, params OrderCreteria<T>[] sortingParams)
-            : this(fetchStrategy: new FetchAllStrategy<T>(), pagination: pagination, sortingParams: sortingParams)
+            : this(fetchStrategy: null, pagination: pagination, sortingParams: sortingParams)
         {
         }
 

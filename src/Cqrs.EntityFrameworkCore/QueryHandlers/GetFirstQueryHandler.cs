@@ -15,24 +15,26 @@
         , IQueryHandlerAsync<GetFirstQuery<TEntity>, TEntity>
         where TEntity : class
     {
-        public GetFirstQueryHandler(EfDataSourceBased dataSource)
+        public GetFirstQueryHandler(EfDataSourceBased dataSource, IFetchStrategy<TEntity> defaultFetchStrategy)
         {
             DataSource = dataSource;
+            DefaultFetchStrategy = defaultFetchStrategy;
         }
 
-        public GetFirstQueryHandler(DataSourceFactory dataSourceFactory)
-            : this(dataSourceFactory.GetForEntity<TEntity>())
+        public GetFirstQueryHandler(DataSourceFactory dataSourceFactory, IFetchStrategy<TEntity> defaultFetchStrategy)
+            : this(dataSourceFactory.GetForEntity<TEntity>(), defaultFetchStrategy)
         {
         }
 
         public EfDataSourceBased DataSource { get; }
+        public IFetchStrategy<TEntity> DefaultFetchStrategy { get; }
 
         protected IQueryable<TEntity> PrepareQuery(GetFirstQuery<TEntity> query)
         {
             return DataSource.Query<TEntity>()
                 .MaybeWhere(query.Specification)
                 .MaybeSort(query.Sorting)
-                .ApplyFetchStrategy(query.FetchStrategy, DataSource._dbContext);
+                .ApplyFetchStrategy(query.FetchStrategy ?? DefaultFetchStrategy, DataSource._dbContext);
         }
 
         public TEntity Request(GetFirstQuery<TEntity> query)

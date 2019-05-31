@@ -19,17 +19,19 @@
         , IQueryHandlerAsync<GetManyQuery<T>, ILimitedEnumerable<T>>
         where T : class
     {
-        public GetManyQueryHandler(EfDataSourceBased dataSource)
+        public GetManyQueryHandler(EfDataSourceBased dataSource, IFetchStrategy<T> defaultFetchStrategy)
         {
             DataSource = dataSource;
+            DefaultFetchStrategy = defaultFetchStrategy;
         }
 
-        public GetManyQueryHandler(DataSourceFactory dataSourceFactory)
-            : this(dataSourceFactory.GetForEntity<T>())
+        public GetManyQueryHandler(DataSourceFactory dataSourceFactory, IFetchStrategy<T> defaultFetchStrategy)
+            : this(dataSourceFactory.GetForEntity<T>(), defaultFetchStrategy)
         {
         }
 
         public EfDataSourceBased DataSource { get; }
+        public IFetchStrategy<T> DefaultFetchStrategy { get; }
 
         protected IQueryable<T> GetFilteredSourceCollection(ISpecification<T> specification)
         {
@@ -41,7 +43,7 @@
             return GetFilteredSourceCollection(query.Specification)
                 .MaybeSort(query.Sorting)
                 .MaybeTake(query.Pagination)
-                .ApplyFetchStrategy(query.FetchStrategy, DataSource._dbContext);
+                .ApplyFetchStrategy(query.FetchStrategy ?? DefaultFetchStrategy, DataSource._dbContext);
         }
 
         public IEnumerable<T> Request(GetManyQuery<T> query)

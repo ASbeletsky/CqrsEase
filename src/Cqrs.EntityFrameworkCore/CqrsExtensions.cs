@@ -4,17 +4,24 @@
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using AutoMapper;
+    using Cqrs.Common.Queries;
+    using Cqrs.Common.Queries.FetchStrategies;
     using Cqrs.Core;
     using Cqrs.Core.Abstractions;
     using Cqrs.EntityFrameworkCore.DataSource;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
     using System;
+    using System.Reflection;
     #endregion
 
     public static class CqrsExtensions 
     {
-        public static IServiceCollection UseCqrsEntityFramework<TDbContext>(this IServiceCollection services, Action<ContainerBuilder> registrations = null, Profile automapperProfile = null) where TDbContext : DbContext
+        public static IServiceCollection UseCqrsEntityFramework<TDbContext>(this IServiceCollection services,
+            Action<ContainerBuilder> registrations = null,
+            Profile automapperProfile = null,
+            Type defaultFetchStrategy = null)
+            where TDbContext : DbContext
         {
             var defaultServiceProvider = services.BuildServiceProvider();
             var factory = defaultServiceProvider.GetService<DataSourceFactory>() ?? new DataSourceFactory(defaultServiceProvider);
@@ -41,7 +48,16 @@
             }).As<IMapper>().InstancePerLifetimeScope();
 
             builder.RegisterType<AutoMapperProjector>().As<IProjector>().InstancePerLifetimeScope();
+            if (defaultFetchStrategy != null && typeof(IFetchStrategy<>).GetTypeInfo().IsAssignableFrom(defaultFetchStrategy.GetTypeInfo()))
+            {
+                throw new ArgumentException("Default fetch strategy type doesn't implement IFetchStrategy interface", nameof(defaultFetchStrategy));
+            }
+            else
+            {
+                defaultFetchStrategy = typeof(FetchAllStrategy<>);
+            }
 
+            builder.RegisterGeneric(defaultFetchStrategy).As(typeof(IFetchStrategy<>));
             var serviceProvider = new AutofacServiceProvider(builder.Build());
             ServiceProvider.Initialize(serviceProvider);
             services.AddSingleton<AutofacServiceProvider>(serviceProvider);
