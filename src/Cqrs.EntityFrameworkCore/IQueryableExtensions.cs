@@ -29,7 +29,7 @@
         internal static IQueryable<T> ApplyFetchStrategy<T>(this IQueryable<T> source, IFetchStrategy<T> fetchStrategy, DbContext dbContext)
             where T : class
         {
-            if (fetchStrategy != null && !(fetchStrategy is FetchAllStrategy<T>))
+            if (fetchStrategy != null)
             {
                 var entityType = dbContext.Model.FindEntityType(typeof(T));
                 if(entityType != null)

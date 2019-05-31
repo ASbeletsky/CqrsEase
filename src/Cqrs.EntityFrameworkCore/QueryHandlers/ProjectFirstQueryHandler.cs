@@ -16,26 +16,32 @@
         where TSource : class
         where TDest : class
     {
-        public ProjectFirstQueryHandler(EfDataSourceBased dataSource, IProjector projector)
+        public ProjectFirstQueryHandler(EfDataSourceBased dataSource, IProjector projector, IFetchStrategy<TSource> defaultFetchStrategy, IFetchStrategy<TDest> defaultDestFetchStrategy)
         {
             DataSource = dataSource;
             Projector = projector;
+            DefaultSourceFetchStrategy = defaultFetchStrategy;
+            DefaultDestFetchStrategy = defaultDestFetchStrategy;
         }
 
-        public ProjectFirstQueryHandler(DataSourceFactory dataSourceFactory, IProjector projector)
-            : this(dataSourceFactory.GetForEntity<TSource>(), projector)
+        public ProjectFirstQueryHandler(DataSourceFactory dataSourceFactory, IProjector projector, IFetchStrategy<TSource> defaultFetchStrategy, IFetchStrategy<TDest> defaultDestFetchStrategy)
+            : this(dataSourceFactory.GetForEntity<TSource>(), projector, defaultFetchStrategy, defaultDestFetchStrategy)
         {
         }
 
         public EfDataSourceBased DataSource { get; }
         public IProjector Projector { get; }
+        public IFetchStrategy<TSource> DefaultSourceFetchStrategy { get; private set; }
+        public IFetchStrategy<TDest> DefaultDestFetchStrategy { get; }
 
         protected IQueryable<TDest> PrepareQuery(ProjectFirstQuery<TSource, TDest> query)
         {
-            return Projector.ProjectTo<TDest>(DataSource.Query<TSource>())
+            var destinationFetchStrategy = query.FetchStrategy ?? DefaultDestFetchStrategy;
+            var source = DataSource.Query<TSource>().ApplyFetchStrategy(DefaultSourceFetchStrategy, DataSource._dbContext);        
+            return Projector.ProjectTo<TSource, TDest>(source, destinationFetchStrategy.FetchedPaths)
                 .MaybeWhere(query.Specification)
                 .MaybeSort(query.Sorting)
-                .ApplyFetchStrategy(query.FetchStrategy, DataSource._dbContext);
+                .ApplyFetchStrategy(destinationFetchStrategy);
         }
 
         public TDest Request(ProjectFirstQuery<TSource, TDest> query)

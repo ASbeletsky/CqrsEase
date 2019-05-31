@@ -38,7 +38,9 @@
 
         protected IQueryable<TDest> GetFilteredSourceCollection(ISpecification<TDest> specification)
         {
-            return Projector.ProjectTo<TDest>(DataSource.Query<TSource>()).MaybeWhere(specification);
+            var fetchAllSourceDataStrategy = new FetchOnlyStrategy<TSource>(typeof(TSource).GetProperiesNames().ToArray());
+            var source = DataSource.Query<TSource>().ApplyFetchStrategy(fetchAllSourceDataStrategy, DataSource._dbContext);
+            return Projector.ProjectTo<TDest>(source).MaybeWhere(specification);
         }
 
         protected IQueryable<TDest> PrepareDataQuery(GetManyQuery<TDest> query)
