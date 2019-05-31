@@ -1,8 +1,8 @@
-﻿namespace Cqrs.JsonApi
+﻿namespace Cqrs.JsonApi.Web.Request
 {
+    using Cqrs.Common;
     #region Using
     using Cqrs.Common.Queries;
-    using Cqrs.Common.Queries.Pagination;
     using Cqrs.Common.Queries.Sorting;
     using NSpecifications;
     using System;
@@ -19,81 +19,66 @@
             var resouceBaseType = typeof(IResource).GetTypeInfo();
             var rootResourceProperties = typeof(TResource).GetTypeInfo().DeclaredProperties;
             var relatedResourcesProperies = rootResourceProperties.Where(p => resouceBaseType.IsAssignableFrom(p.PropertyType.GetTypeInfo()));
-            
+
             if (relatedResourcesProperies != null && relatedResourcesProperies.Any())
             {
-
-                var relatedResourcesToInlude = fetchStrategy.FetchedPaths.Where(path => relatedResourcesProperies.Any(prop => path.Contains(prop.Name)));
+                var relatedResourcesToInlude = fetchStrategy.FetchedPaths.Where(path => relatedResourcesProperies.Any(prop => path.Contains(prop.Name))).Select(f => f.ToCamelCase());
                 var includedResourcesString = string.Join(",", relatedResourcesToInlude);
-                return $"include={includedResourcesString}";
+                return includedResourcesString;
             }
 
             return string.Empty;
         }
 
-        internal static string ToJsonApiSparseFields<TResource>(this IFetchStrategy<TResource> fetchStrategy) where TResource : IResource, new()
+        internal static IDictionary<string, string> ToJsonApiSparseFields<TResource>(this IFetchStrategy<TResource> fetchStrategy) where TResource : IResource, new()
         {
-            var resouceBaseType = typeof(IResource).GetTypeInfo();
+            var result = new Dictionary<string, string>();
             var resourceType = Activator.CreateInstance<TResource>();
             var relatedResourceSparseFields = fetchStrategy.FetchedPaths.Where(path => path.Contains("."));
-            var rootResourceSparseFields = fetchStrategy.FetchedPaths.Except(relatedResourceSparseFields);
+            var rootResourceSparseFields = fetchStrategy.FetchedPaths.Except(relatedResourceSparseFields).Select(f => f.ToCamelCase());
 
             string rootResourceSparseFieldsString = string.Join(",", rootResourceSparseFields);
-            string result = $"fields[{resourceType.Type}]={rootResourceSparseFieldsString}";
+            result.Add(resourceType.Type, rootResourceSparseFieldsString);
 
-            if(relatedResourceSparseFields.Any())
+            if (relatedResourceSparseFields.Any())
             {
                 //TODO: finish fileds to related reources
-
-                string relatedResourceSparseFieldsString = string.Join(",", relatedResourceSparseFields);
-                result += $"fields[{resourceType.Type}]={rootResourceSparseFieldsString}";
             }
 
             return result;
         }
-        
-
-        internal static string ToJsonApiSorting<TResource>(this IEnumerable<OrderCreteria<TResource>> orderCreterias) where TResource : IResource
-        {
-            string sortFields = string.Join(",", orderCreterias.Select(c => c.ToJsonApiParameter()));
-            return $"sort={sortFields}";
-        }
 
         internal static string ToJsonApiParameter<TResource>(this OrderCreteria<TResource> orderCreteria) where TResource : IResource
         {
-            return $"{orderCreteria.Direction}{orderCreteria.SortKey}";
-        }
-
-        internal static string ToJsonApiPaging(this IPage page)
-        {
-            return $"page[size]={page.Size}&page[number]={page.Number}";
+            string direction = orderCreteria.Direction == OrderDirection.DESC ? "-" : string.Empty;
+            return $"{direction}{orderCreteria.SortKey.ToCamelCase()}";
         }
 
         #region Filtering
 
-        internal static string ToJsonApiFilter<TResource>(this ISpecification<TResource> specification) where TResource : IResource
+        internal static IDictionary<string, string> ToJsonApiFilter<TResource>(this ISpecification<TResource> specification) where TResource : IResource
         {
             var lambda = specification.Expression;
-            return BuildFilterParams(lambda.Body);
+            var result = new Dictionary<string, string>();
+            BuildFilterParams(lambda.Body, ref result);
+            return result;
         }
 
-        private static string BuildFilterParams(Expression expression)
+        private static void BuildFilterParams(Expression expression, ref Dictionary<string, string> result)
         {
-            string filterParams = string.Empty;
             if (expression.NodeType == ExpressionType.Equal)
             {
                 BinaryExpression eq = (BinaryExpression)expression;
                 MemberExpression proteprtySelector = (MemberExpression)eq.Left;
                 string propertyName = proteprtySelector.Member.Name;
                 object value = Evaluate(eq.Right);
-                filterParams = $"filter[{propertyName}]={value}";
+                result.Add(propertyName.ToCamelCase(), value.ToString().ToCamelCase());
             }
             else if (expression is BinaryExpression binaryExpression)
             {
-                filterParams = string.Join("&", BuildFilterParams(binaryExpression.Left), BuildFilterParams(binaryExpression.Right));
+                BuildFilterParams(binaryExpression.Left, ref result);
+                BuildFilterParams(binaryExpression.Right, ref result);
             }
-
-            return filterParams;
         }
 
         private static object Evaluate(Expression e)

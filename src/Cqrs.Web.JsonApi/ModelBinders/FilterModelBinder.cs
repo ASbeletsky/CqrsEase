@@ -1,5 +1,6 @@
 ﻿namespace Cqrs.Web.JsonApi.ModelBinders
 {
+    using Cqrs.Common;
     #region Using
     using Cqrs.JsonApi;
     using Microsoft.AspNetCore.Http;

@@ -1,4 +1,5 @@
-﻿using Cqrs.Common.Queries.Sorting;
+﻿using Cqrs.Common;
+using Cqrs.Common.Queries.Sorting;
 using Cqrs.JsonApi;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Collections.Generic;

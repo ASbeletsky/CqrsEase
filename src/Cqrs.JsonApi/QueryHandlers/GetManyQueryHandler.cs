@@ -1,47 +1,44 @@
 ﻿namespace Cqrs.JsonApi.QueryHandlers
 {
-    #region Using
+    #region 
     using Cqrs.Common.Queries;
-    using Cqrs.Common.Queries.Pagination;
     using Cqrs.Core.Abstractions;
     using Cqrs.JsonApi.Web;
     using Cqrs.JsonApi.Web.Request;
     using Microsoft.AspNetCore.Http.Extensions;
-    using System.Linq;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     #endregion
 
-    public class GetFirstQueryHandler<TResource>
-        : IQueryHandlerAsync<GetFirstQuery<TResource>, TResource>
-        where TResource : class, IResource, new()
+    public class GetManyQueryHandler<TResource>
+        : IQueryHandlerAsync<GetManyQuery<TResource>, IEnumerable<TResource>>
+        where TResource : IResource, new()
     {
-        public GetFirstQueryHandler(string baseUrl)
+        public GetManyQueryHandler(string baseUrl)
         {
             ResourceEndpoint = new JsonApiClient(baseUrl).For<IJsonApiEndpoint<TResource>>();
         }
 
         public IJsonApiEndpoint<TResource> ResourceEndpoint { get; private set; }
 
-        protected string BuildQueryString(GetFirstQuery<TResource> query)
+        protected string BuildQueryString(GetManyQuery<TResource> query)
         {
-            var takeOnePaging = new Page(pageNumber: 1, pageSize: 1);
             var queryString = new QueryBuilder()
                 .MaybeAddIncludedResources(query.FetchStrategy)
-                .MaybeAddSparseFieldsets(query.FetchStrategy)
                 .MaybeAddFilter(query.Specification)
-                .MaybeAddPaging(takeOnePaging)
+                .MaybeAddPaging(query.Pagination)
                 .MaybeAddSorting(query.Sorting)
+                .MaybeAddSparseFieldsets(query.FetchStrategy)
                 .ToQueryString();
 
             return queryString.Value;
         }
 
-        public async Task<TResource> RequestAsync(GetFirstQuery<TResource> query)
+        public async Task<IEnumerable<TResource>> RequestAsync(GetManyQuery<TResource> query)
         {
             var queryString = BuildQueryString(query);
             var responce = await ResourceEndpoint.Get(queryString);
-            return responce?.Data?.FirstOrDefault();
+            return responce?.Data;
         }
     }
-
 }
