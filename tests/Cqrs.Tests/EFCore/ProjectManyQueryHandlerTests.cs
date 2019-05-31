@@ -211,8 +211,8 @@
                 });
 
                 Assert.Collection(blogsDtos,
-                    b1 => Assert.Equal(firstBlog.Comments.Select(c => c.Content), b1.Comments),
-                    b2 => Assert.Equal(secondBlog.Comments.Select(c => c.Content), b2.Comments)
+                    b1 => Assert.Equal(firstBlog.Comments.Select(c => c.Content), b1.Comments.Select(c => c.Content)),
+                    b2 => Assert.Equal(secondBlog.Comments.Select(c => c.Content), b2.Comments.Select(c => c.Content))
                 );
             }
         }

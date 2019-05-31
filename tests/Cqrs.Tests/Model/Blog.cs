@@ -8,6 +8,6 @@ namespace Cqrs.Tests.Model
         public string Title { get; set; }
         public int AuthorId { get; set; }
         public Author Author { get; set; }
-        public ICollection<Comment> Comments { get; set; }
+        public IEnumerable<Comment> Comments { get; set; }
     }
 }

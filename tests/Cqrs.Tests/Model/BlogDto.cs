@@ -8,7 +8,7 @@ namespace Cqrs.Tests.Model
         public string Id { get; set; }
         public string Title { get; set; }
         public AuthorDto Author { get; set; }
-        public IEnumerable<string> Comments { get; set; }
+        public IEnumerable<CommentDto> Comments { get; set; }
 
         public string Type => "blog";
     }

@@ -7,6 +7,7 @@
     using Cqrs.Common.Queries.Sorting;
     using Cqrs.Core.Abstractions;
     using Cqrs.EntityFrameworkCore.DataSource;
+    using Cqrs.EntityFrameworkCore.FetchStrategies;
     using Cqrs.EntityFrameworkCore.QueryHandlers;
     using Cqrs.Tests.Model;
     using Microsoft.EntityFrameworkCore;
@@ -29,7 +30,7 @@
                 context.SaveChanges();
                 var spec = new Spec<Blog>(b => b.Title == "cool blog");
                 var query = new GetManyQuery<Blog>(spec);
-                var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context));
+                var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context), new FetchAllStrategy<Blog>());
                 var blogs = queryHandler.Request(query);
 
                 Assert.NotNull(blogs);
@@ -57,7 +58,7 @@
 
                 var orderByIdDesc = new OrderCreteria<Blog>(nameof(Blog.Id), OrderDirection.DESC);
                 var query = new GetManyQuery<Blog>(orderByIdDesc);
-                var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context));
+                var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context), new FetchAllStrategy<Blog>());
                 var blogs = queryHandler.Request(query);
 
                 Assert.NotNull(blogs);
@@ -84,7 +85,7 @@
                 context.SaveChanges();
 
                 var query = new GetManyQuery<Blog>();
-                var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context));
+                var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context), new FetchAllStrategy<Blog>());
                 var blogs = queryHandler.Request(query);
 
                 Assert.NotNull(blogs);
@@ -112,7 +113,7 @@
 
                 var includeOnlyId = new FetchOnlyStrategy<Blog>((b => b.Id));
                 var query = new GetManyQuery<Blog>(includeOnlyId);
-                var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context));
+                var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context), new FetchAllStrategy<Blog>());
                 var blogs = queryHandler.Request(query);
 
                 Assert.NotNull(blogs);
@@ -126,7 +127,7 @@
         }
 
         [Fact]
-        public void DoesNotIncludeRelatedEntities_WhenFetchStrategyNotProvided()
+        public void DoesNotIncludeRelatedEntities_WithFetchAllExceptNavigationsStrategy()
         {
             var options = new DbContextOptionsBuilder<BloggingContext>().UseInMemoryDatabase(databaseName: "GetManyQueryHandler_DoesNotIncludeRelatedEntities_WhenFetchStrategyNotProvided").Options;
             var context = new BloggingContext(options);
@@ -150,7 +151,7 @@
                 context.SaveChanges();
 
                 var getAllBlogsQuery = new GetManyQuery<Blog>();
-                var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context));
+                var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context), new FetchAllExceptNavigationsStrategy<Blog>(context));
                 var blogs = queryHandler.Request(getAllBlogsQuery);
 
                 Assert.NotNull(blogs);
@@ -189,7 +190,7 @@
 
                 var includeIdAndComments = new FetchOnlyStrategy<Blog>(b => b.Id, b => b.Comments);
                 var getAllBlogsQuery = new GetManyQuery<Blog>(includeIdAndComments);
-                var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context));
+                var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context), new FetchAllStrategy<Blog>());
                 var blogs = queryHandler.Request(getAllBlogsQuery);
 
                 Assert.NotNull(blogs);
@@ -219,7 +220,7 @@
 
                 var page = new Page(pageSize: 2);
                 var query = new GetManyQuery<Blog>(page);
-                var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context));
+                var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context), new FetchAllStrategy<Blog>());
                 var blogs = (queryHandler as IQueryHandler<GetManyQuery<Blog>, ILimitedEnumerable<Blog>>).Request(query);
 
                 Assert.NotNull(blogs);
@@ -247,7 +248,7 @@
 
                 var page = new Page(pageNumber: 2, pageSize: 2);
                 var query = new GetManyQuery<Blog>(page);
-                var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context));
+                var queryHandler = new GetManyQueryHandler<Blog>(new EfDataSourceBased(context), new FetchAllStrategy<Blog>());
                 var blogs = (queryHandler as IQueryHandler<GetManyQuery<Blog>, ILimitedEnumerable<Blog>>).Request(query);
 
                 Assert.NotNull(blogs);
