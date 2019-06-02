@@ -23,7 +23,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cqrs.Tests", "tests\Cqrs.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cqrs.Web.JsonApi", "src\Cqrs.Web.JsonApi\Cqrs.Web.JsonApi.csproj", "{E66E506B-18FF-4DAE-B23D-81FF8AEDB556}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cqrs.Common", "src\Cqrs.Common\Cqrs.Common.csproj", "{9B5AC4DF-8B6C-4E6E-8033-AB107BE97D59}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cqrs.Common", "src\Cqrs.Common\Cqrs.Common.csproj", "{9B5AC4DF-8B6C-4E6E-8033-AB107BE97D59}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6CB2390D-2F51-422E-AD66-38367E796816}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
