@@ -17,7 +17,7 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandProcessor"/> class.
         /// </summary>
-        /// <param name="serviceProvider">The <see cref="IServiceProvider" instance with registred command handlers of appropriate commands. /></param>
+        /// <param name="serviceProvider">The <see cref="IServiceProvider"/> instance with registred command handlers of appropriate commands. /></param>
         public CommandProcessor(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
