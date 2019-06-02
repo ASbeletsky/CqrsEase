@@ -17,7 +17,7 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryProcessor"/> class.
         /// </summary>
-        /// <param name="serviceProvider">The <see cref="IServiceProvider" instance with registred query handlers of appropriate queries. /></param>
+        /// <param name="serviceProvider">The <see cref="IServiceProvider"/> instance with registred query handlers of appropriate queries. /></param>
         public QueryProcessor(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
