@@ -2,75 +2,91 @@
 {
     #region Using
     using Autofac;
+    using Autofac.Core;
+    using Autofac.Core.Activators.Reflection;
     using AutoMapper;
     using Cqrs.EntityFrameworkCore.CommandHandlers;
     using Cqrs.EntityFrameworkCore.DataSource;
     using Cqrs.EntityFrameworkCore.QueryHandlers;
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
     #endregion
 
+    internal class ConstrustorWithDataSourceFactory : IConstructorSelector
+    {
+        public ConstructorParameterBinding SelectConstructorBinding(ConstructorParameterBinding[] constructorBindings, IEnumerable<Parameter> parameters)
+        {
+            var construstor = constructorBindings.SingleOrDefault(b => b.TargetConstructor.GetParameters().Any(p => p.ParameterType == typeof(DataSourceFactory)));
+            return construstor;
+        }
+    }
+
     internal class EfCoreHandlers : Autofac.Module
     {
+        
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
+            var dataSourceFactoryConstructor = new ConstrustorWithDataSourceFactory();
+
             builder.RegisterType<AutoMapperProjector>()
                 .As<IProjector>()
                 .InstancePerLifetimeScope();
 
             builder.RegisterGeneric(typeof(GetFirstQueryHandler<>))
-                .UsingConstructor(typeof(DataSourceFactory))
+                .UsingConstructor(dataSourceFactoryConstructor)
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
             builder.RegisterGeneric(typeof(ProjectFirstQueryHandler<,>))
-                .UsingConstructor(typeof(DataSourceFactory), typeof(IProjector))
+                .UsingConstructor(dataSourceFactoryConstructor)
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
             builder.RegisterGeneric(typeof(GetManyQueryHandler<>))
-                .UsingConstructor(typeof(DataSourceFactory))
+                .UsingConstructor(dataSourceFactoryConstructor)
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
             builder.RegisterGeneric(typeof(ProjectManyQueryHandler<,>))
-                .UsingConstructor(typeof(DataSourceFactory), typeof(IProjector))
+                .UsingConstructor(dataSourceFactoryConstructor)
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
             builder.RegisterGeneric(typeof(ExistsQueryHandler<>))
-                .UsingConstructor(typeof(DataSourceFactory))
+                .UsingConstructor(dataSourceFactoryConstructor)
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
             builder.RegisterGeneric(typeof(CountQueryHandler<>))
-                .UsingConstructor(typeof(DataSourceFactory))
+                .UsingConstructor(dataSourceFactoryConstructor)
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
             builder.RegisterGeneric(typeof(CreateCommandHandler<>))
-                .UsingConstructor(typeof(DataSourceFactory))
+                .UsingConstructor(dataSourceFactoryConstructor)
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
             builder.RegisterGeneric(typeof(CreateManyCommandHandler<>))
-                .UsingConstructor(typeof(DataSourceFactory))
+                .UsingConstructor(dataSourceFactoryConstructor)
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
             builder.RegisterGeneric(typeof(UpdateCommandHandler<>))
-                .UsingConstructor(typeof(DataSourceFactory))
+                .UsingConstructor(dataSourceFactoryConstructor)
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
             builder.RegisterGeneric(typeof(UpdateCommandHandler<,>))
-                .UsingConstructor(typeof(DataSourceFactory), typeof(IMapper))
+                .UsingConstructor(dataSourceFactoryConstructor)
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
             builder.RegisterGeneric(typeof(DeleteCommandHandler<>))
-                .UsingConstructor(typeof(DataSourceFactory))
+                .UsingConstructor(dataSourceFactoryConstructor)
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
         }
