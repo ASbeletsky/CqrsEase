@@ -24,23 +24,13 @@
     }
 
     internal class EfCoreHandlers : Autofac.Module
-    {
-        
+    {       
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
             var dataSourceFactoryConstructor = new ConstrustorWithDataSourceFactory();
 
-            builder.RegisterType<AutoMapperProjector>()
-                .As<IProjector>()
-                .InstancePerLifetimeScope();
-
             builder.RegisterGeneric(typeof(GetFirstQueryHandler<>))
-                .UsingConstructor(dataSourceFactoryConstructor)
-                .AsImplementedInterfaces()
-                .InstancePerLifetimeScope();
-
-            builder.RegisterGeneric(typeof(ProjectFirstQueryHandler<,>))
                 .UsingConstructor(dataSourceFactoryConstructor)
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
@@ -50,10 +40,6 @@
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterGeneric(typeof(ProjectManyQueryHandler<,>))
-                .UsingConstructor(dataSourceFactoryConstructor)
-                .AsImplementedInterfaces()
-                .InstancePerLifetimeScope();
 
             builder.RegisterGeneric(typeof(ExistsQueryHandler<>))
                 .UsingConstructor(dataSourceFactoryConstructor)

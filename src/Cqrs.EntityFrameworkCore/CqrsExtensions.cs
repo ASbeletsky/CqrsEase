@@ -47,7 +47,6 @@
                  return new Mapper(ctx.Resolve<IConfigurationProvider>(), scope.Resolve);
             }).As<IMapper>().InstancePerLifetimeScope();
 
-            builder.RegisterType<AutoMapperProjector>().As<IProjector>().InstancePerLifetimeScope();
             if (defaultFetchStrategy != null && typeof(IFetchStrategy<>).GetTypeInfo().IsAssignableFrom(defaultFetchStrategy.GetTypeInfo()))
             {
                 throw new ArgumentException("Default fetch strategy type doesn't implement IFetchStrategy interface", nameof(defaultFetchStrategy));

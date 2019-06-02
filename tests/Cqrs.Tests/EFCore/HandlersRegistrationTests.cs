@@ -37,30 +37,7 @@
             Assert.Equal(typeof(GetFirstQueryHandler<Blog>), blogHandlerAsync.GetType());
             Assert.NotNull((blogHandler as GetFirstQueryHandler<Blog>).DataSource);
             Assert.NotNull((blogHandlerAsync as GetFirstQueryHandler<Blog>).DataSource);
-        }
-
-        [Fact]
-        public void RegistersProjectFirstQueryHandler()
-        {
-            var services = new ServiceCollection();
-            services.AddDbContext<BloggingContext>(o => o.UseInMemoryDatabase());
-
-            services.UseCqrsEntityFramework<BloggingContext>();
-            var defaultServiceProvider = services.BuildServiceProvider();
-            var autofacServiceProvider = defaultServiceProvider.GetService<AutofacServiceProvider>();
-
-            var blogHandler = autofacServiceProvider.GetService<IQueryHandler<ProjectFirstQuery<Blog, BlogDto>, BlogDto>>();
-            var blogHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<ProjectFirstQuery<Blog, BlogDto>, BlogDto>>();
-
-            Assert.NotNull(blogHandler);
-            Assert.NotNull(blogHandlerAsync);
-            Assert.Equal(typeof(ProjectFirstQueryHandler<Blog, BlogDto>), blogHandler.GetType());
-            Assert.Equal(typeof(ProjectFirstQueryHandler<Blog, BlogDto>), blogHandlerAsync.GetType());
-            Assert.NotNull((blogHandler as ProjectFirstQueryHandler<Blog, BlogDto>).DataSource);
-            Assert.NotNull((blogHandler as ProjectFirstQueryHandler<Blog, BlogDto>).Projector);
-            Assert.NotNull((blogHandlerAsync as ProjectFirstQueryHandler<Blog, BlogDto>).DataSource);
-            Assert.NotNull((blogHandlerAsync as ProjectFirstQueryHandler<Blog, BlogDto>).Projector);
-        }
+        }     
 
         [Fact]
         public void RegistersGetManyQueryHandler()
@@ -102,29 +79,6 @@
             Assert.Equal(typeof(GetManyQueryHandler<Blog>), blogHandlerAsync.GetType());
             Assert.NotNull((blogHandler as GetManyQueryHandler<Blog>).DataSource);
             Assert.NotNull((blogHandlerAsync as GetManyQueryHandler<Blog>).DataSource);
-        }
-
-        [Fact]
-        public void RegistersProjectManyQueryHandler()
-        {
-            var services = new ServiceCollection();
-            services.AddDbContext<BloggingContext>(o => o.UseInMemoryDatabase());
-
-            services.UseCqrsEntityFramework<BloggingContext>();
-            var defaultServiceProvider = services.BuildServiceProvider();
-            var autofacServiceProvider = defaultServiceProvider.GetService<AutofacServiceProvider>();
-
-            var blogHandler = autofacServiceProvider.GetService<IQueryHandler<ProjectManyQuery<Blog, BlogDto>, IEnumerable<BlogDto>>>();
-            var blogHandlerAsync = autofacServiceProvider.GetService<IQueryHandlerAsync<ProjectManyQuery<Blog, BlogDto>, IEnumerable<BlogDto>>>();
-            
-            Assert.NotNull(blogHandler);
-            Assert.NotNull(blogHandlerAsync);
-            Assert.Equal(typeof(ProjectManyQueryHandler<Blog, BlogDto>), blogHandler.GetType());
-            Assert.Equal(typeof(ProjectManyQueryHandler<Blog, BlogDto>), blogHandlerAsync.GetType());
-            Assert.NotNull((blogHandler as ProjectManyQueryHandler<Blog, BlogDto>).DataSource);
-            Assert.NotNull((blogHandler as ProjectManyQueryHandler<Blog, BlogDto>).Projector);
-            Assert.NotNull((blogHandlerAsync as ProjectManyQueryHandler<Blog, BlogDto>).DataSource);
-            Assert.NotNull((blogHandlerAsync as ProjectManyQueryHandler<Blog, BlogDto>).Projector);
         }
 
         [Fact]
