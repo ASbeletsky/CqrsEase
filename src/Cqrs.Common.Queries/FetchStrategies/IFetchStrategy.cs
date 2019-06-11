@@ -6,6 +6,7 @@ namespace Cqrs.Common.Queries
     {
         IEnumerable<string> FetchedPaths { get; }
         void Include(string path);
+        void IncludeRange(IEnumerable<string> paths);
         INestedFetchStrategy<T, TFetchedMember> Include<TFetchedMember>(string path) where TFetchedMember : class;
     }
 

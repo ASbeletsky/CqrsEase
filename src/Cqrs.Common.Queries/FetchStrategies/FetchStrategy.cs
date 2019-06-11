@@ -27,6 +27,14 @@
             Include(path);
             return new NestedFetchStrategy<T, TFetchedMember>(_fetchedPaths);
         }
+
+        public void IncludeRange(IEnumerable<string> paths)
+        {
+            foreach(var path in paths)
+            {
+                Include(path);
+            }
+        }
     }
 
     internal class NestedFetchStrategy<T, TPreviousMember> : FetchStrategy<T>, INestedFetchStrategy<T, TPreviousMember>
