@@ -1,5 +1,6 @@
 ﻿namespace Cqrs.Tests.Web
 {
+    using Cqrs.Common.Queries;
     #region Using
     using Cqrs.Tests.Model;
     using Cqrs.Web.JsonApi.ModelBinders;
@@ -40,11 +41,11 @@
             actionContext.HttpContext = httpContextMock.Object;
 
             var bindingContextMock = new Mock<ModelBindingContext>();
-            bindingContextMock.Setup(x => x.ModelType).Returns(typeof(ISpecification<BlogDto>));
+            bindingContextMock.Setup(x => x.ModelType).Returns(typeof(IFetchStrategy<BlogDto>));
             bindingContextMock.Setup(x => x.HttpContext).Returns(httpContextMock.Object);
             bindingContextMock.Setup(x => x.ActionContext).Returns(actionContext);
 
-            var binder = new FilterModelBinder<BlogDto>();    
+            var binder = new FieldsModelBinder<BlogDto>();
             await binder.BindModelAsync(bindingContextMock.Object);
 
             Assert.Null(bindingContextMock.Object.Model);
