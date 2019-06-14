@@ -16,24 +16,57 @@ namespace Cqrs.Web.JsonApi.ModelBinders
     public class FieldsModelBinder<TResource> : IModelBinder
         where TResource : IResource, new()
     {
+        private string _rootResourceType;
+        internal string RootResourceType
+        {
+            get
+            {
+                if (_rootResourceType == null)
+                {
+                    var defaultResorce = new TResource();
+                    _rootResourceType = defaultResorce.Type;
+                }
+
+                return _rootResourceType;
+            }
+        }
+
+
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
             if (bindingContext.ModelType == typeof(IFetchStrategy<TResource>))
             {
+                var query = bindingContext.ActionContext.HttpContext.Request.Query;
                 var parameters = bindingContext.ActionContext.HttpContext.Request.QueryString;
                 var fetchStrategy = default(IFetchStrategy<TResource>);
-                if (parameters.HasValue)
-                {
-                    if(parameters.Value.Contains("fields"))
-                    {
-                        fetchStrategy = new FetchOnlyStrategy<TResource>(nameof(IResource.Id), nameof(IResource.Type));
-                        var resourcesFields = ParseSparceFieldsets(parameters);
-                        IncludeSparceFieldsets(fetchStrategy, resourcesFields);
-                    }                    
-                }
-                else
+
+                bool hasSparceFieldsets = parameters.HasValue && parameters.Value.Contains("fields");
+                bool hasIncudedRelations = query.ContainsKey("include");
+
+                if (!hasSparceFieldsets && !hasIncudedRelations)
                 {
                     fetchStrategy = new FetchAllExceptRelationsStrategy<TResource>();
+                }
+
+                if(!hasSparceFieldsets && hasIncudedRelations)
+                {
+                    var inlcudesResources = query["include"].First();
+                    fetchStrategy = new FetchAllIncludingRelationsStrategy<TResource>(inlcudesResources.Split(','));
+                }
+
+                if(hasSparceFieldsets && !hasIncudedRelations)
+                {
+                    var rootFieldsParameter = $"fields[{RootResourceType}]";
+                    var fields = query[rootFieldsParameter].FirstOrDefault() ?? throw new ArgumentException($"cannot parse {rootFieldsParameter} parameter");
+                    var properties = fields.Split(',').Select(field => field.ToPascalCase()).ToArray();
+                    fetchStrategy = new FetchOnlyStrategy<TResource>(properties);
+                }
+
+                if(hasSparceFieldsets && hasIncudedRelations)
+                {
+                    fetchStrategy = new FetchOnlyStrategy<TResource>(nameof(IResource.Id), nameof(IResource.Type));
+                    var resourcesSparceFieldsets = ParseSparceFieldsets(parameters);
+                    IncludeSparceFieldsets(fetchStrategy, resourcesSparceFieldsets);
                 }
 
                 bindingContext.Model = fetchStrategy;
@@ -46,7 +79,7 @@ namespace Cqrs.Web.JsonApi.ModelBinders
         private Dictionary<string, IEnumerable<string>> ParseSparceFieldsets(QueryString queryString)
         {
             var regex = new Regex(@"fields\[(?<key>[^.]+)\]=(?<value>[^.]+)");
-            var fieldsKeyValues = new Dictionary<string, IEnumerable<string>>();
+            var resourcesSparceFieldsets = new Dictionary<string, IEnumerable<string>>();
             queryString
                 .Value
                 .Substring(1)
@@ -57,20 +90,22 @@ namespace Cqrs.Web.JsonApi.ModelBinders
                 {
                     var groups = regex.Match(_).Groups;
                     if (groups.Count == 0) throw new ArgumentOutOfRangeException();
-                    fieldsKeyValues.Add(groups["key"].Value, groups["value"].Value.Split(','));
+                    var resourceType = groups["key"].Value;
+                    var resourceFields = groups["value"].Value.Split(',');
+                    resourcesSparceFieldsets.Add(resourceType, resourceFields);
                 });
 
-            return fieldsKeyValues;
+            return resourcesSparceFieldsets;
         }
 
         private void IncludeSparceFieldsets(IFetchStrategy<TResource> fetchStrategy, Dictionary<string, IEnumerable<string>> resourcesFields)
         {
-            var defaultResorce = new TResource();
+            
             foreach(var resourceFields in resourcesFields)
             {
                 var resourceType = resourceFields.Key;
                 var properties = resourceFields.Value.Select(field => field.ToPascalCase());
-                if (resourceType == defaultResorce.Type)
+                if (resourceType == RootResourceType)
                 {
                     fetchStrategy.IncludeRange(properties);
                 }
