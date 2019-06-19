@@ -1,18 +1,21 @@
-﻿using Cqrs.Common;
-using Cqrs.Common.Queries;
-using Cqrs.Common.Queries.FetchStrategies;
-using Cqrs.JsonApi;
-using Cqrs.Web.JsonApi.FetchStrategies;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-namespace Cqrs.Web.JsonApi.ModelBinders
+﻿namespace Cqrs.Web.JsonApi.ModelBinders
 {
+    #region Using
+    using Cqrs.Common;
+    using Cqrs.Common.Queries;
+    using Cqrs.Common.Queries.FetchStrategies;
+    using Cqrs.JsonApi;
+    using Cqrs.JsonApi.Web.Request;
+    using Cqrs.Web.JsonApi.FetchStrategies;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc.ModelBinding;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text.RegularExpressions;
+    using System.Threading.Tasks;
+    #endregion
+
     public class FieldsModelBinder<TResource> : IModelBinder
         where TResource : IResource, new()
     {
@@ -31,7 +34,14 @@ namespace Cqrs.Web.JsonApi.ModelBinders
             }
         }
 
-
+        internal string[] RequiredResourceFields
+        {
+            get
+            {
+                return new string[] { nameof(IResource.Id), nameof(IResource.Type) };
+            }
+        }
+        
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
             if (bindingContext.ModelType == typeof(IFetchStrategy<TResource>))
@@ -50,21 +60,39 @@ namespace Cqrs.Web.JsonApi.ModelBinders
 
                 if(!hasSparceFieldsets && hasIncudedRelations)
                 {
-                    var inlcudesResources = query["include"].First();
-                    fetchStrategy = new FetchAllIncludingRelationsStrategy<TResource>(inlcudesResources.Split(','));
+                    var inlcudedResourcesValue = query[JsonApiQueryParams.Include].FirstOrDefault();
+                    if (string.IsNullOrWhiteSpace(inlcudedResourcesValue))
+                        throw new ArgumentException($"cannot parse {JsonApiQueryParams.Include} parameter", JsonApiQueryParams.Include);
+
+                    fetchStrategy = new FetchAllIncludingRelationsStrategy<TResource>(inlcudedResourcesValue.Split(','));
                 }
 
                 if(hasSparceFieldsets && !hasIncudedRelations)
                 {
-                    var rootFieldsParameter = $"fields[{RootResourceType}]";
-                    var fields = query[rootFieldsParameter].FirstOrDefault() ?? throw new ArgumentException($"cannot parse {rootFieldsParameter} parameter");
-                    var properties = fields.Split(',').Select(field => field.ToPascalCase()).ToArray();
-                    fetchStrategy = new FetchOnlyStrategy<TResource>(properties);
+                    var resourcesSparceFieldsets = ParseSparceFieldsets(parameters);
+                    var notIncludedRelation = resourcesSparceFieldsets.Keys.FirstOrDefault(resourceType => resourceType != RootResourceType);
+                    if (notIncludedRelation != null)
+                    {
+                        var relationFieldsParameter = string.Format(JsonApiQueryParams.SparseFieldsetsTemplate, notIncludedRelation);
+                        throw new ArgumentException($"SparceFieldsets for type {notIncludedRelation} was provided, but this type is not mentioned at {JsonApiQueryParams.Include} parameter", relationFieldsParameter);
+                    }
+
+                    if ( !resourcesSparceFieldsets.Any()
+                        || !resourcesSparceFieldsets.ContainsKey(RootResourceType)
+                        || !resourcesSparceFieldsets[RootResourceType].Any()
+                        || resourcesSparceFieldsets[RootResourceType].Any(prop => string.IsNullOrWhiteSpace(prop)))
+                    {
+                        var rootFieldsParameter = string.Format(JsonApiQueryParams.SparseFieldsetsTemplate, RootResourceType);
+                        throw new ArgumentException($"cannot parse {rootFieldsParameter} parameter", rootFieldsParameter);
+                    }
+                    
+                    fetchStrategy = new FetchOnlyStrategy<TResource>(RequiredResourceFields);
+                    IncludeSparceFieldsets(fetchStrategy, resourcesSparceFieldsets);
                 }
 
                 if(hasSparceFieldsets && hasIncudedRelations)
                 {
-                    fetchStrategy = new FetchOnlyStrategy<TResource>(nameof(IResource.Id), nameof(IResource.Type));
+                    fetchStrategy = new FetchOnlyStrategy<TResource>(RequiredResourceFields);
                     var resourcesSparceFieldsets = ParseSparceFieldsets(parameters);
                     IncludeSparceFieldsets(fetchStrategy, resourcesSparceFieldsets);
                 }
@@ -79,6 +107,7 @@ namespace Cqrs.Web.JsonApi.ModelBinders
         private Dictionary<string, IEnumerable<string>> ParseSparceFieldsets(QueryString queryString)
         {
             var regex = new Regex(@"fields\[(?<key>[^.]+)\]=(?<value>[^.]+)");
+            var parseException = new ArgumentException("cannot parse fields parameter", "fields");
             var resourcesSparceFieldsets = new Dictionary<string, IEnumerable<string>>();
             queryString
                 .Value
@@ -89,8 +118,9 @@ namespace Cqrs.Web.JsonApi.ModelBinders
                 .ForEach(_ =>
                 {
                     var groups = regex.Match(_).Groups;
-                    if (groups.Count == 0) throw new ArgumentOutOfRangeException();
+                    if (groups.Count == 0) throw parseException;
                     var resourceType = groups["key"].Value;
+                    if (string.IsNullOrWhiteSpace(resourceType)) throw parseException;
                     var resourceFields = groups["value"].Value.Split(',');
                     resourcesSparceFieldsets.Add(resourceType, resourceFields);
                 });
@@ -123,7 +153,5 @@ namespace Cqrs.Web.JsonApi.ModelBinders
                 }
             }
         }
-
-
     }
 }
