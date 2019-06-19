@@ -45,7 +45,7 @@
             bindingContextMock.Setup(x => x.HttpContext).Returns(httpContextMock.Object);
             bindingContextMock.Setup(x => x.ActionContext).Returns(actionContext);
 
-            var binder = new FieldsModelBinder<BlogDto>();
+            var binder = new FilterModelBinder<BlogDto>();
             await binder.BindModelAsync(bindingContextMock.Object);
 
             Assert.Null(bindingContextMock.Object.Model);
