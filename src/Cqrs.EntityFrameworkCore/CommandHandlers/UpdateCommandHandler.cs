@@ -1,6 +1,7 @@
 ﻿namespace Cqrs.EntityFrameworkCore.CommandHandlers
-{    
+{
     #region Using
+    using Cqrs.Common;
     using Cqrs.Common.Commands;
     using Cqrs.Core.Abstractions;
     using Cqrs.EntityFrameworkCore.DataSource;

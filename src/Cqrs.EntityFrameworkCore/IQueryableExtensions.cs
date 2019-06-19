@@ -1,6 +1,7 @@
 ﻿namespace Cqrs.EntityFrameworkCore
 {
     #region Using
+    using Cqrs.Common;
     using Cqrs.Common.Queries;
     using Cqrs.Common.Queries.FetchStrategies;
     using Cqrs.Common.Queries.Pagination;

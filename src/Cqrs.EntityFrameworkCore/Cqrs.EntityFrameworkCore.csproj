@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Cqrs.Common.Commands\Cqrs.Common.Commands.csproj" />
     <ProjectReference Include="..\Cqrs.Common.Queries\Cqrs.Common.Queries.csproj" />
+    <ProjectReference Include="..\Cqrs.Common\Cqrs.Common.csproj" />
     <ProjectReference Include="..\Cqrs.Core\Cqrs.Core.csproj" />
   </ItemGroup>
 
