@@ -1,0 +1,10 @@
+﻿namespace CqrsEase.EntityFrameworkCore.DataSource
+{
+
+    using System.Linq;
+
+    interface IQueryableDataSource
+    {
+        IQueryable<T> Query<T>() where T : class;
+    }
+}

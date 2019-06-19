@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.4.0" />
+    <PackageReference Include="AutoMapper" Version="6.2.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.6" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.1.1" />
+    <PackageReference Include="NSpecification" Version="1.3.0" />
+    <PackageReference Include="System.Linq.Expressions" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CqrsEase.Common.Commands\CqrsEase.Common.Commands.csproj" />
+    <ProjectReference Include="..\CqrsEase.Common.Queries\CqrsEase.Common.Queries.csproj" />
+    <ProjectReference Include="..\CqrsEase.Common\CqrsEase.Common.csproj" />
+    <ProjectReference Include="..\CqrsEase.Core\CqrsEase.Core.csproj" />
+  </ItemGroup>
+
+</Project>

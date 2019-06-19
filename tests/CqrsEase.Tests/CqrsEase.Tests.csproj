@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="1.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="1.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="1.1.6" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="Moq" Version="4.10.1" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\CqrsEase.Common.Commands\CqrsEase.Common.Commands.csproj" />
+    <ProjectReference Include="..\..\src\CqrsEase.Common.Queries\CqrsEase.Common.Queries.csproj" />
+    <ProjectReference Include="..\..\src\CqrsEase.Common\CqrsEase.Common.csproj" />
+    <ProjectReference Include="..\..\src\CqrsEase.Core\CqrsEase.Core.csproj" />
+    <ProjectReference Include="..\..\src\CqrsEase.EntityFrameworkCore\CqrsEase.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\..\src\CqrsEase.JsonApi\CqrsEase.JsonApi.csproj" />
+    <ProjectReference Include="..\..\src\CqrsEase.Web.JsonApi\CqrsEase.Web.JsonApi.csproj" />
+  </ItemGroup>
+
+</Project>
