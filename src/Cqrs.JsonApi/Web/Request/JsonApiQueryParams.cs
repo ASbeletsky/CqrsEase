@@ -1,12 +1,12 @@
 ﻿namespace Cqrs.JsonApi.Web.Request
 {
-    internal static class JsonApiQueryParams
+    public static class JsonApiQueryParams
     {
-        internal const string Include = "include";
-        internal const string SparseFieldsetsTemplate = "fields[{0}]";
-        internal const string FieldFilterTemplate = "filter[{0}]";
-        internal const string PageSize = "page[size]";
-        internal const string PageNumber = "page[number]";
-        internal const string Sorting = "sort";
+        public const string Include = "include";
+        public const string SparseFieldsetsTemplate = "fields[{0}]";
+        public const string FieldFilterTemplate = "filter[{0}]";
+        public const string PageSize = "page[size]";
+        public const string PageNumber = "page[number]";
+        public const string Sorting = "sort";
     }
 }

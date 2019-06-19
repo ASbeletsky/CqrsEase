@@ -1,13 +1,16 @@
-﻿using Cqrs.Common;
-using Cqrs.Common.Queries.Sorting;
-using Cqrs.JsonApi;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Cqrs.Web.JsonApi.ModelBinders
+﻿namespace Cqrs.Web.JsonApi.ModelBinders
 {
+    #region Using
+    using Cqrs.Common;
+    using Cqrs.Common.Queries.Sorting;
+    using Cqrs.JsonApi;
+    using Cqrs.JsonApi.Web.Request;
+    using Microsoft.AspNetCore.Mvc.ModelBinding;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    #endregion
+
     public class SortModelBinder<TResource> : IModelBinder
         where TResource : IResource
     {
@@ -15,7 +18,7 @@ namespace Cqrs.Web.JsonApi.ModelBinders
         {
             if (bindingContext.ModelType == typeof(IEnumerable<OrderCreteria<TResource>>))
             {
-                var sortParameters = bindingContext.ActionContext.HttpContext.Request.Query["sort"];
+                var sortParameters = bindingContext.ActionContext.HttpContext.Request.Query[JsonApiQueryParams.Sorting];
                 if (sortParameters.Any())
                 {
                     var sortParameter = sortParameters.First();
