@@ -2,6 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.1</TargetFramework>
+    <Version>1.0.0-rc</Version>
+    <Authors>Anton Biletskyi</Authors>
+    <Company />
+    <Product>Cqrs</Product>
+    <Description>Contains generic definition of widely used command for create/update/delete operations</Description>
+    <PackageLicenseUrl>https://github.com/ASbeletsky/CqrsEase/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/ASbeletsky/CqrsEase</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ASbeletsky/CqrsEase</RepositoryUrl>
+    <PackageTags>Cqrs Cqs Generic Command</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>

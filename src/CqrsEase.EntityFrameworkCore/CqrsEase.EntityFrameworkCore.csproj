@@ -2,6 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.0-rc</Version>
+    <Authors>Anton Biletskyi</Authors>
+    <Company />
+    <Product>Cqrs</Product>
+    <Description>Implementation of generic CRUD operations for Entity Framework Core in Cqrs approach</Description>
+    <PackageProjectUrl>https://github.com/ASbeletsky/CqrsEase</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/ASbeletsky/CqrsEase/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/ASbeletsky/CqrsEase</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Cqrs Cqs Generic CRUD EntityFramework EntityFrameworkCore EfCore</PackageTags>
+    <PackageId>CqrsEase.EntityFramework</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

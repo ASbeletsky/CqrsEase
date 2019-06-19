@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.1</TargetFramework>
-    <Authors>biletskiy.anton</Authors>
-    <PackageLicenseUrl>https://github.com/ASbeletsky/Cqrs.Core/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/ASbeletsky/Cqrs.Core</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/ASbeletsky/Cqrs.Core</RepositoryUrl>
+    <Authors>Anton Biletskyi</Authors>
+    <PackageLicenseUrl>https://github.com/ASbeletsky/CqrsEase/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/ASbeletsky/CqrsEase</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ASbeletsky/CqrsEase</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>Cqrs Cqs</PackageTags>
     <Description>Lightweight implementation of Cqrs pattern</Description>
