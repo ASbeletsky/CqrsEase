@@ -15,7 +15,7 @@
     using System.Reflection;
     #endregion
 
-    internal static class IQueriableExtensions
+    public static class IQueriableExtensions
     {
         public static IQueryable<T> ApplyFetchStrategy<T>(this IQueryable<T> source, IFetchStrategy<T> fetchStrategy)
         {
