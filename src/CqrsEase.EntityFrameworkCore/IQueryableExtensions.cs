@@ -17,7 +17,7 @@
 
     internal static class IQueriableExtensions
     {
-        internal static IQueryable<T> ApplyFetchStrategy<T>(this IQueryable<T> source, IFetchStrategy<T> fetchStrategy)
+        public static IQueryable<T> ApplyFetchStrategy<T>(this IQueryable<T> source, IFetchStrategy<T> fetchStrategy)
         {
             if (fetchStrategy != null && !(fetchStrategy is FetchAllStrategy<T>))
             {
@@ -27,7 +27,7 @@
             return source;
         }
 
-        internal static IQueryable<T> ApplyFetchStrategy<T>(this IQueryable<T> source, IFetchStrategy<T> fetchStrategy, DbContext dbContext)
+        public static IQueryable<T> ApplyFetchStrategy<T>(this IQueryable<T> source, IFetchStrategy<T> fetchStrategy, DbContext dbContext)
             where T : class
         {
             if (fetchStrategy != null)
@@ -50,7 +50,7 @@
 
 
 
-    internal static IQueryable<T> SelectOnly<T>(this IQueryable<T> queryable, IEnumerable<string> paths)
+        public static IQueryable<T> SelectOnly<T>(this IQueryable<T> queryable, IEnumerable<string> paths)
         {
             var projectionSelector = BuildSelector<T>(paths);
             return queryable.Select(projectionSelector).AsQueryable();
@@ -74,7 +74,7 @@
             return lambda.Compile();
         }
 
-        internal static IQueryable<T> MaybeTake<T>(this IQueryable<T> source, IPage page)
+        public static IQueryable<T> MaybeTake<T>(this IQueryable<T> source, IPage page)
         {
             if(page != null)
             {
@@ -85,7 +85,7 @@
         }
 
         #region Filtering
-        internal static IQueryable<T> MaybeWhere<T>(this IQueryable<T> source, ISpecification<T> specification)
+        public static IQueryable<T> MaybeWhere<T>(this IQueryable<T> source, ISpecification<T> specification)
         {
             if(specification != null)
             {
@@ -98,7 +98,7 @@
         #endregion
 
         #region Ordering
-        internal static IQueryable<T> MaybeSort<T>(this IQueryable<T> source, IEnumerable<OrderCreteria<T>> orderCreterias)
+        public static IQueryable<T> MaybeSort<T>(this IQueryable<T> source, IEnumerable<OrderCreteria<T>> orderCreterias)
         {
             if(orderCreterias != null && orderCreterias.Any())
             {
@@ -111,7 +111,7 @@
             return source;
         }
 
-        internal static IQueryable<T> MaybeSort<T>(this IQueryable<T> source, OrderCreteria<T> orderCreteria)
+        public static IQueryable<T> MaybeSort<T>(this IQueryable<T> source, OrderCreteria<T> orderCreteria)
         {
             if (source.IsOrdered()) return (source as IOrderedQueryable<T>).MaybeSort(orderCreteria);
 
@@ -123,7 +123,7 @@
             return source;
         }
 
-        internal static bool IsOrdered<T>(this IQueryable<T> queryable)
+        public static bool IsOrdered<T>(this IQueryable<T> queryable)
         {
             if (queryable == null)
             {
@@ -133,7 +133,7 @@
             return queryable.Expression.Type == typeof(IOrderedQueryable<T>);
         }
 
-        internal static IOrderedQueryable<T> MaybeSort<T>(this IOrderedQueryable<T> source, OrderCreteria<T> orderCreteria)
+        public static IOrderedQueryable<T> MaybeSort<T>(this IOrderedQueryable<T> source, OrderCreteria<T> orderCreteria)
         {
             if (orderCreteria != null)
             {
@@ -143,22 +143,22 @@
             return source;
         }
 
-        internal static IOrderedQueryable<T> OrderByMember<T>(this IQueryable<T> source, string memberPath)
+        public static IOrderedQueryable<T> OrderByMember<T>(this IQueryable<T> source, string memberPath)
         {
             return source.OrderByMemberUsing(memberPath, "OrderBy");
         }
 
-        internal static IOrderedQueryable<T> OrderByMemberDescending<T>(this IQueryable<T> source, string memberPath)
+        public static IOrderedQueryable<T> OrderByMemberDescending<T>(this IQueryable<T> source, string memberPath)
         {
             return source.OrderByMemberUsing(memberPath, "OrderByDescending");
         }
 
-        internal static IOrderedQueryable<T> ThenByMember<T>(this IOrderedQueryable<T> source, string memberPath)
+        public static IOrderedQueryable<T> ThenByMember<T>(this IOrderedQueryable<T> source, string memberPath)
         {
             return source.OrderByMemberUsing(memberPath, "ThenBy");
         }
 
-        internal static IOrderedQueryable<T> ThenByMemberDescending<T>(this IOrderedQueryable<T> source, string memberPath)
+        public static IOrderedQueryable<T> ThenByMemberDescending<T>(this IOrderedQueryable<T> source, string memberPath)
         {
             return source.OrderByMemberUsing(memberPath, "ThenByDescending");
         }
