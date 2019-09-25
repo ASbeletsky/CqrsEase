@@ -19,7 +19,7 @@ namespace CqrsEase.Common.Queries
 
         public static IEnumerable<string> GetProperiesNames(this Type type)
         {
-            return type.GetTypeInfo().DeclaredProperties.Select(p => p.Name);
+            return type.GetRuntimeProperties().Select(p => p.Name);
         }
 
         internal static MemberExpression AsMemberExpression(this Expression exp)

@@ -53,10 +53,10 @@
         public static IQueryable<T> SelectOnly<T>(this IQueryable<T> queryable, IEnumerable<string> paths)
         {
             var projectionSelector = BuildSelector<T>(paths);
-            return queryable.Select(projectionSelector).AsQueryable();
+            return queryable.Select(projectionSelector);
         }
 
-        private static Func<T, T> BuildSelector<T>(IEnumerable<string> paths)
+        private static Expression<Func<T, T>> BuildSelector<T>(IEnumerable<string> paths)
         {
             var type = typeof(T);
             var lamdaParameter = Expression.Parameter(typeof(T), "x");
@@ -71,7 +71,7 @@
             var xInit = Expression.MemberInit(xNew, bindings);
             // expression "x => new T { Field1 = o.Field1, Field2 = o.Field2 }"
             var lambda = Expression.Lambda<Func<T, T>>(xInit, lamdaParameter);
-            return lambda.Compile();
+            return lambda;
         }
 
         public static IQueryable<T> MaybeTake<T>(this IQueryable<T> source, IPage page)
